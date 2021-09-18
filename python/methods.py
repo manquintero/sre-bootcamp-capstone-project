@@ -92,6 +92,10 @@ class Restricted:
         # These values could come up from the DB
         valid_roles = ['admin', 'editor', 'viewer']
 
+        # Validate inputs
+        if not isinstance(authorization, str):
+            return False
+
         # Sanitize
         authorization = authorization.strip()
 

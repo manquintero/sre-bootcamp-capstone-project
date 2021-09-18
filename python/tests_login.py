@@ -40,6 +40,10 @@ class RestrictedTestCase(unittest.TestCase):
         """ Asserts a role have privilege access granted """
         self.assertTrue(self.validate.access_data(BEARER_TOKEN))
 
+    def test_access_data_none(self):
+        """ Asserts sending a None value returns a false """
+        self.assertFalse(self.validate.access_data(None))
+
     def test_access_data_corrupt(self):
         """ Changing one character returns a False """
         corrupt_token = TOKEN[0:-1] + 'a'
