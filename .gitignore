@@ -54,3 +54,7 @@ __pycache__/
 provision/.*/*
 
 provision/terraform/destroy-candidate.sh
+
+
+# PyCharm
+.idea/
