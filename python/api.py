@@ -3,7 +3,7 @@
 import mysql.connector
 from flask import Flask, jsonify, abort, request
 
-from convert import mask_to_cidr, cidr_to_mask
+from convert import mask_to_cidr
 from methods import Token, Restricted
 
 app = Flask(__name__)
@@ -43,7 +43,7 @@ def url_login():
     cursor = con.cursor()
     cursor.execute(f"SELECT salt, password, role from users where username ='{var1}';")
     rows = cursor.fetchall()
-    var3 = login.generateToken(var1, var2, rows)
+    var3 = login.generate_token(var1, var2, rows)
     if not var3:
         abort(401)
     response = {"data": var3}
@@ -55,7 +55,7 @@ def url_login():
 def url_cidr_to_mask():
     """ Convert CIDR to their equivalent in subnet masks """
     var1 = request.headers.get('Authorization')
-    if not protected.access_Data(var1):
+    if not protected.access_data(var1):
         abort(401)
     val = request.args.get('value')
     response = {"function": "cidrToMask", "input": val, "output": cidr_to_mask(val), }
@@ -67,7 +67,7 @@ def url_cidr_to_mask():
 def url_mask_to_cidr():
     """ Convert subnet masks to their equivalent in CIDR """
     var1 = request.headers.get('Authorization')
-    if not protected.access_Data(var1):
+    if not protected.access_data(var1):
         abort(401)
     val = request.args.get('value')
     response = {"function": "maskToCidr", "input": val, "output": mask_to_cidr(val), }
