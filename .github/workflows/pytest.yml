@@ -25,6 +25,6 @@ jobs:
           pytest python
       - name: Build Coverage
         run: |
-          pytest --cov python > pytest-coverage.txt
+          pytest --cov-config=python/.coveragerc --cov python > pytest-coverage.txt
       - name: Comment coverage
         uses: coroo/pytest-coverage-commentator@v1.0.2

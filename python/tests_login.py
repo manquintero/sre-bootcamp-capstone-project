@@ -25,9 +25,8 @@ class TokenTestCase(unittest.TestCase):
         self.assertEqual(TOKEN, self.convert.generate_token('admin', 'secret'))
 
     def test_generate_token_not_found(self):
-        """ Sending a non matching password returns Forbidden """
-        with self.assertRaises(Forbidden):
-            self.assertEqual(TOKEN, self.convert.generate_token('noadmin', 'secret'))
+        """ Sending a non matching password returns None """
+        self.assertIsNone(self.convert.generate_token('noadmin', 'secret'))
 
 
 class RestrictedTestCase(unittest.TestCase):
