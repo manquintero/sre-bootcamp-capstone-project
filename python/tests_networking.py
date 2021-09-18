@@ -3,7 +3,7 @@
 
 import unittest
 
-from convert import cidr_to_mask, mask_to_cidr, ipv4_validation, INVALID
+from convert import cidr_to_mask, mask_to_cidr, is_ipv4_valid, INVALID
 
 
 TEST_CASES = (
@@ -41,6 +41,7 @@ TEST_CASES = (
     ('128.0.0.0', '1'),
     ('0.0.0.0', '0'),
 )
+INVALID_IP_CASE = '192.168.1.2.3'
 
 
 class CidrToMaskTestCase(unittest.TestCase):
@@ -75,11 +76,29 @@ class MaskToCidrTestCase(unittest.TestCase):
 
     def test_valid_mask_to_cidr(self):
         """ Assert for Valid Mask to Class A CIDR """
-        self.assertEqual('1', mask_to_cidr('128.0.0.0'))
+        for test_case in TEST_CASES:
+            mask, cidr = test_case
+            with self.subTest(cidr):
+                self.assertEqual(cidr, mask_to_cidr(mask))
 
     def test_invalid_mask_to_cidr(self):
         """ Assert an Invalid Maks is set to CIDR """
-        self.assertEqual('Invalid', mask_to_cidr('0.0.0.0'))
+        test_cases = (
+            '0.0.0.256',
+            '256.0.0.0',
+            '1',
+        )
+        for mask in test_cases:
+            with self.subTest(mask):
+                self.assertEqual(INVALID, mask_to_cidr(mask))
+
+    def test_invalid_mask_to_cidr_integer(self):
+        """ Assert an Invalid Maks is set to CIDR """
+        self.assertEqual(INVALID, mask_to_cidr(1))
+
+    def test_invalid_mask_to_cidr_invalid(self):
+        """ Assert an Invalid Masks is set to CIDR """
+        self.assertEqual(INVALID, mask_to_cidr(INVALID_IP_CASE))
 
 
 class IPV4ValidationTestCase(unittest.TestCase):
@@ -87,11 +106,11 @@ class IPV4ValidationTestCase(unittest.TestCase):
 
     def test_valid_ipv4(self):
         """ Validates an IPV4 format """
-        self.assertTrue(ipv4_validation('127.0.0.1'))
+        self.assertTrue(is_ipv4_valid('127.0.0.0'))
 
     def test_invalid_ipv4(self):
         """ Validates an invalid IPV4 format """
-        self.assertFalse(ipv4_validation('192.168.1.2.3'))
+        self.assertFalse(is_ipv4_valid(INVALID_IP_CASE))
 
 
 if __name__ == '__main__':  # pragma: no cover

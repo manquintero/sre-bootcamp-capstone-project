@@ -1,5 +1,7 @@
 #!/usr/bin/python3
 """ This module contains utilities to convert and validate CIDR and Network Masks in IPv4 """
+import ipaddress
+import math
 
 MIN_BITS = 0
 MAX_BITS = 32
@@ -13,7 +15,6 @@ INVALID = 'Invalid'
 def cidr_to_mask(cidr: str):
     """ Convert from Classless Interdomain Routing (CIDR) to Mask
 
-    :param cidr: A string containing the number of bits to mask
     :param cidr: A string containing the number of bits to mask
     :return: A str representing the number of bits enabled to 1
     """
@@ -45,18 +46,41 @@ def cidr_to_mask(cidr: str):
 
 
 def mask_to_cidr(mask):
-    """
+    """ Convert from Mask to Classless Interdomain Routing (CIDR)
 
-    :param mask:
-    :return:
+    :param mask: A string containing the subnetwork mask
+    :return: A str representing the number of bits to mask
     """
-    return mask
+    if not isinstance(mask, str):
+        return INVALID
+
+    if not is_ipv4_valid(mask):
+        return INVALID
+
+    # Get the blocks as integers
+    blocks = [int(b) for b in mask.split('.', 4)]
+
+    mask_in_int = 0  # Accumulator
+    for block in blocks:
+        mask_in_int = mask_in_int << BITS_BY_BLOCK
+        mask_in_int = mask_in_int | block
+
+    # The bits are MAX_NUMB allowed minus the log2 of the difference in the complements)
+    cidr_bits = int(MAX_BITS - math.log2(MAX_IP - mask_in_int))
+
+    return str(cidr_bits)
 
 
-def ipv4_validation(ipv4):
-    """
+def is_ipv4_valid(ipv4):
+    """ This is simple a wrapper for ipaddress class
 
     :param ipv4:
     :return:
     """
-    return ipv4
+    valid = True
+    try:
+        ipaddress.ip_address(ipv4)
+    except ValueError:
+        valid = False
+
+    return valid
