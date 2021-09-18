@@ -3,7 +3,7 @@
 import mysql.connector
 from flask import Flask, jsonify, abort, request
 
-from convert import mask_to_cidr
+from convert import mask_to_cidr, cidr_to_mask
 from methods import Token, Restricted
 
 app = Flask(__name__)
