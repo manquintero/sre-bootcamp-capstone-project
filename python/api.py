@@ -3,14 +3,12 @@
 import mysql.connector
 from flask import Flask, jsonify, abort, request
 
-from convert import CidrMaskConvert, IpValidate
+from convert import mask_to_cidr, cidr_to_mask
 from methods import Token, Restricted
 
 app = Flask(__name__)
 login = Token()
 protected = Restricted()
-convert = CidrMaskConvert()
-validate = IpValidate()
 
 
 # Just a health check
@@ -60,7 +58,7 @@ def url_cidr_to_mask():
     if not protected.access_Data(var1):
         abort(401)
     val = request.args.get('value')
-    response = {"function": "cidrToMask", "input": val, "output": convert.cidr_to_mask(val), }
+    response = {"function": "cidrToMask", "input": val, "output": cidr_to_mask(val), }
     return jsonify(response)
 
 
@@ -72,7 +70,7 @@ def url_mask_to_cidr():
     if not protected.access_Data(var1):
         abort(401)
     val = request.args.get('value')
-    response = {"function": "maskToCidr", "input": val, "output": convert.mask_to_cidr(val), }
+    response = {"function": "maskToCidr", "input": val, "output": mask_to_cidr(val), }
     return jsonify(response)
 
 
