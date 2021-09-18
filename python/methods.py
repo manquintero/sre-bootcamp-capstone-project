@@ -2,6 +2,8 @@
 """ This Module contains Classes to work with User Access """
 
 import hashlib
+import os
+
 import jwt
 from jwt import DecodeError
 
@@ -45,12 +47,33 @@ class Restricted:
     # pylint: disable=too-few-public-methods
 
     @staticmethod
-    def access_data(authorization):
-        """ Return if the token is an recognized role """
+    def access_data(authorization: str):
+        """ Check if the role can access a resource
+
+        :param authorization: Authorization Bearer Token
+        :return: Whether or not the role can see the contents
+        """
+        # These values could come up from the DB
+        valid_roles = ['admin', 'editor', 'viewer']
+
+        # Sanitize
+        authorization = authorization.strip()
+
+        # Validate the authorization contains a prefix tag such as 'Bearer'
+        if authorization.count(' ') != 1:
+            return False
+
+        scheme, token = authorization.split(' ')
+
+        if scheme != 'Bearer:':
+            return False
+
         try:
-            authorization = authorization.replace('Bearer', '')[2:-1]
-            var1 = jwt.decode(authorization, USEFUL_KEY, algorithms='HS256')
+            key = os.getenv('JWT_TOKEN', USEFUL_KEY)
+            payload = jwt.decode(token.encode(), key, algorithms='HS256')
         except DecodeError:
             return False
 
-        return 'role' in var1
+        role = payload.get('role', None)
+
+        return role in valid_roles

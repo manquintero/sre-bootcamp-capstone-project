@@ -5,7 +5,7 @@ import unittest
 
 from methods import Token, Restricted
 
-TOKEN = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiYWRtaW4ifQ' \
+TOKEN = 'Bearer: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiYWRtaW4ifQ' \
         '.BmcZ8aB5j8wLSK8CqdDwkGxZfFwM1X1gfAIN7cXOx9w '
 
 
@@ -29,8 +29,22 @@ class RestrictedTestCase(unittest.TestCase):
 
     def test_access_data(self):
         """ Asserts a role have privilege access granted """
-        self.assertEqual('You are under protected data', self.validate.access_data(TOKEN))
+        self.assertTrue(self.validate.access_data(TOKEN))
+
+    def test_access_data_corrupt(self):
+        """ Changing one character returns a False """
+        corrupt_token = TOKEN[0:-1] + 'a'
+        self.assertFalse(self.validate.access_data(corrupt_token))
+
+    def test_access_data_invalid_schema(self):
+        """ Not sending the flag 'Bearer' sends an Unauthorized """
+        invalid_schema_token = TOKEN.replace('Bearer:', 'Token:')
+        self.assertFalse(self.validate.access_data(invalid_schema_token))
+
+    def test_access_data_no_bearer(self):
+        """ Not sending the flag 'Bearer' sends an Unauthorized """
+        self.assertFalse(self.validate.access_data('fyJh.eyb2'))
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     unittest.main()

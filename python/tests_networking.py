@@ -42,5 +42,5 @@ class IPV4ValidationTestCase(unittest.TestCase):
         self.assertFalse(ipv4_validation('192.168.1.2.3'))
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     unittest.main()

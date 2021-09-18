@@ -58,3 +58,7 @@ provision/terraform/destroy-candidate.sh
 
 # PyCharm
 .idea/
+
+# Coverage
+.coverage
+htmlcov/
