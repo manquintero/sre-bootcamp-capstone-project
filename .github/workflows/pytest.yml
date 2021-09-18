@@ -16,19 +16,15 @@ jobs:
         with:
           python-version: 3.9
       - name: Install dependencies
-        run: >
+        run: |
           python -m pip install --upgrade pip
-
           pip install pytest pytest-cov
-
-          [[ -f "./python/requirements.txt" ]] && pip install -r
-          "./python/requirements.txt"
+          [[ -f "./python/requirements.txt" ]] && pip install -r "./python/requirements.txt"
       - name: Test with pytest
         run: |
-          pytest auth_api/python/tests.py
+          pytest python
       - name: Build Coverage
-        run: >
-          pytest --cache-clear --cov=auth_api auth_api/python/tests.py >
-          pytest-coverage.txt
+        run: |
+          pytest --cov python > pytest-coverage.txt
       - name: Comment coverage
         uses: coroo/pytest-coverage-commentator@v1.0.2
