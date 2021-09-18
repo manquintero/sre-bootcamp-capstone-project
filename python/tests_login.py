@@ -5,7 +5,6 @@ import unittest
 from unittest.mock import patch
 
 from jwt import DecodeError
-from werkzeug.exceptions import Forbidden
 
 from methods import Token, Restricted
 
