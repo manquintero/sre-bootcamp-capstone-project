@@ -2,11 +2,37 @@
 """ This Module contains Classes to work with User Access """
 
 import hashlib
-import jwt
-from jwt import DecodeError
+import os
+from http.client import FORBIDDEN
 
+import jwt
+import mysql.connector
+from jwt import DecodeError
+from flask import abort
 
 USEFUL_KEY = 'my2w7wjd7yXF64FIADfJxNs1oupTGAuW'
+
+
+class Driver:
+    """ SQL connector to the application DBs """
+
+    # This database data is here just for you to test, please, remember to define your own DB
+    # You can test with username = admin, password = secret
+    # This DB has already a best practice: a salt value to store the passwords
+
+    def __init__(self) -> None:
+        self.cnx = mysql.connector.connect(
+            host='bootcamp-tht.sre.wize.mx',
+            user=os.getenv('DB_USERNAME', 'secret'),
+            password=os.getenv('DB_PASS', 'noPow3r'),
+            database='bootcamp_tht'
+        )
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *exc_details):
+        self.cnx.close()
 
 
 class Token:
@@ -16,26 +42,38 @@ class Token:
     # pylint: disable=too-few-public-methods
 
     @staticmethod
-    def generate_token(username, input_password, query):
-        """
+    def generate_token(username, password):
+        """ The first endpoint receives a username and password.
+
+        When these parameters are correct it returns a JWT token
+        Otherwise it should return a 403 HTTP error message.
 
         :param username:
-        :param input_password:
-        :param query:
+        :param password:
         :return:
         """
+        jwt_token = None
+        query = 'SELECT username, password, salt, role FROM users WHERE username = %s'
+        with Driver() as driver:
+            # Get cursor
+            cursor = driver.cnx.cursor()
+            # In Python, a tuple containing a single value must include a comma.
+            # For example, ('abc') is evaluated as a scalar while ('abc',) is evaluated as a tuple.
+            cursor.execute(query, (username,))
+            for (q_username, q_password, salt, role) in cursor:
+                # Passwords have appended the salt value and hashed with the SHA512 Algorithm
+                salted_input = password + salt
+                hash_value = hashlib.sha512(salted_input.encode()).hexdigest()
 
-        if query is not None:
-            salt = query[0][0]
-            password = query[0][1]
-            role = query[0][2]
-            hash_pass = hashlib.sha512((input_password + salt).encode()).hexdigest()
-            if hash_pass == password:
-                en_jwt = jwt.encode({"role": role}, USEFUL_KEY, algorithm='HS256')
-                return en_jwt
-            return username
+                if username == q_username and hash_value == q_password:
+                    key = os.getenv('JWT_TOKEN', USEFUL_KEY)
+                    jwt_token = jwt.encode({'role': role}, key, algorithm="HS256")
+            cursor.close()
 
-        return username
+        if not jwt_token:
+            abort(FORBIDDEN)
+
+        return jwt_token
 
 
 class Restricted:
@@ -45,12 +83,37 @@ class Restricted:
     # pylint: disable=too-few-public-methods
 
     @staticmethod
-    def access_data(authorization):
-        """ Return if the token is an recognized role """
+    def access_data(authorization: str):
+        """ Check if the role can access a resource
+
+        :param authorization: Authorization Bearer Token
+        :return: Whether or not the role can see the contents
+        """
+        # These values could come up from the DB
+        valid_roles = ['admin', 'editor', 'viewer']
+
+        # Validate inputs
+        if not isinstance(authorization, str):
+            return False
+
+        # Sanitize
+        authorization = authorization.strip()
+
+        # Validate the authorization contains a prefix tag such as 'Bearer'
+        if authorization.count(' ') != 1:
+            return False
+
+        scheme, token = authorization.split(' ')
+
+        if scheme != 'Bearer:':
+            return False
+
         try:
-            authorization = authorization.replace('Bearer', '')[2:-1]
-            var1 = jwt.decode(authorization, USEFUL_KEY, algorithms='HS256')
+            key = os.getenv('JWT_TOKEN', USEFUL_KEY)
+            payload = jwt.decode(token.encode(), key, algorithms='HS256')
         except DecodeError:
             return False
 
-        return 'role' in var1
+        role = payload.get('role', None)
+
+        return role in valid_roles
