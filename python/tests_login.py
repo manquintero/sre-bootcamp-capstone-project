@@ -10,7 +10,7 @@ from methods import Token, Restricted
 
 TOKEN = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiYWRtaW4ifQ' \
         '.BmcZ8aB5j8wLSK8CqdDwkGxZfFwM1X1gfAIN7cXOx9w'
-BEARER_TOKEN = 'Bearer: ' + TOKEN
+BEARER_TOKEN = 'Bearer ' + TOKEN
 
 
 class TokenTestCase(unittest.TestCase):
@@ -49,7 +49,7 @@ class RestrictedTestCase(unittest.TestCase):
 
     def test_access_data_invalid_schema(self):
         """ Not sending the flag 'Bearer' sends an Unauthorized """
-        invalid_schema_token = BEARER_TOKEN.replace('Bearer:', 'Token:')
+        invalid_schema_token = BEARER_TOKEN.replace('Bearer', 'Token')
         self.assertFalse(self.validate.access_data(invalid_schema_token))
 
     def test_access_data_no_bearer(self):

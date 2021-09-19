@@ -6,7 +6,7 @@ import os
 
 import jwt
 import mysql.connector
-from jwt import DecodeError
+
 
 USEFUL_KEY = 'my2w7wjd7yXF64FIADfJxNs1oupTGAuW'
 
@@ -20,7 +20,7 @@ class Driver:
 
     def __init__(self) -> None:
         self.cnx = mysql.connector.connect(
-            host='bootcamp-tht.sre.wize.mx',
+            host=os.getenv('DB_HOST', 'bootcamp-tht.sre.wize.mx'),
             user=os.getenv('DB_USERNAME', 'secret'),
             password=os.getenv('DB_PASS', 'noPow3r'),
             database='bootcamp_tht'
@@ -100,13 +100,13 @@ class Restricted:
 
         scheme, token = authorization.split(' ')
 
-        if scheme != 'Bearer:':
+        if scheme != 'Bearer':
             return False
 
         try:
             key = os.getenv('JWT_TOKEN', USEFUL_KEY)
             payload = jwt.decode(token.encode(), key, algorithms='HS256')
-        except DecodeError:
+        except jwt.DecodeError:
             return False
 
         role = payload.get('role', None)

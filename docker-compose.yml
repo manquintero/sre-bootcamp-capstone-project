@@ -1,0 +1,34 @@
+services:
+  flask:
+    build:
+      context: ./python
+    depends_on:
+      mysql:
+        condition: service_started
+    environment:
+      DB_HOST: mysql
+      DB_PASS: ThscAueWqKMU
+      DB_USERNAME: secret
+      JWT_TOKEN: my2w7wjd7yXF64FIADfJxNs1oupTGAuW
+    image: manquintero/academy-sre-bootcamp-manuel-quintero:latest
+    ports:
+    - published: 8000
+      target: 8000
+    volumes:
+    - ./python:/app:rw
+  mysql:
+    build:
+      context: ./mysql
+    environment:
+      MYSQL_DATABASE: bootcamp_tht
+      MYSQL_PASSWORD: ThscAueWqKMU
+      MYSQL_ROOT_PASSWORD: ThscAueWqKMU
+      MYSQL_USER: secret
+    ports:
+    - published: 3306
+      target: 3306
+    volumes:
+    - mysql_data:/var/lib/mysql:rw
+version: '3.9'
+volumes:
+  mysql_data: {}
