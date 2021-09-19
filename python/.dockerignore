@@ -1,0 +1,8 @@
+# Directories
+__pycache__/
+venv/
+
+# Files
+docker-compose.yml
+Dockerfile
+tests_*.py
