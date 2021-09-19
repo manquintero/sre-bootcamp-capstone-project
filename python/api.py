@@ -30,6 +30,8 @@ def url_health():
 @app.route("/login", methods=['POST'])
 def url_login():
     """ Login page for POST verbs """
+    if 'username' not in request.form or 'password' not in request.form:
+        abort(FORBIDDEN)
     username = request.form['username']
     password = request.form['password']
     token = login.generate_token(username, password)

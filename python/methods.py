@@ -20,7 +20,7 @@ class Driver:
 
     def __init__(self) -> None:
         self.cnx = mysql.connector.connect(
-            host='bootcamp-tht.sre.wize.mx',
+            host=os.getenv('DB_HOST', 'bootcamp-tht.sre.wize.mx'),
             user=os.getenv('DB_USERNAME', 'secret'),
             password=os.getenv('DB_PASS', 'noPow3r'),
             database='bootcamp_tht'
@@ -100,7 +100,7 @@ class Restricted:
 
         scheme, token = authorization.split(' ')
 
-        if scheme != 'Bearer:':
+        if scheme != 'Bearer':
             return False
 
         try:
