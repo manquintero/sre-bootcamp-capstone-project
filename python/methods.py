@@ -6,7 +6,7 @@ import os
 
 import jwt
 import mysql.connector
-from jwt import DecodeError
+
 
 USEFUL_KEY = 'my2w7wjd7yXF64FIADfJxNs1oupTGAuW'
 
@@ -106,7 +106,7 @@ class Restricted:
         try:
             key = os.getenv('JWT_TOKEN', USEFUL_KEY)
             payload = jwt.decode(token.encode(), key, algorithms='HS256')
-        except DecodeError:
+        except jwt.DecodeError:
             return False
 
         role = payload.get('role', None)
