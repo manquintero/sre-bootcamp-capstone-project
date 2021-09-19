@@ -69,7 +69,7 @@ jobs:
         with:
           context: ./python
           push: true
-          tags: '${{ secrets.DOCKER_HUB_USERNAME }}/${IMAGE}:latest'
+          tags: "${{ secrets.DOCKER_HUB_USERNAME }}/${IMAGE}:latest"
         env:
           DB_USERNAME: '${{ secrets.DB_USERNAME }}'
           DB_PASS: '${{ secrets.DB_PASS }}'
