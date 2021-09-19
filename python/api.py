@@ -23,7 +23,7 @@ def url_root():
 @app.route("/_health")
 def url_health():
     """ Entrypoint for automated health checks """
-    return "OK"
+    return "HEALTHY"
 
 
 # e.g. http://127.0.0.1:8000/login

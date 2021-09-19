@@ -1,4 +1,4 @@
-name: Pylint
+name: SCCD
 'on':
   push:
     branches:

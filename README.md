@@ -8,3 +8,4 @@ If you have any questions, feel free to contact your mentor or one of us: Juan B
 | Metric | devel                                                                                                                       | main                                                                                                          |
 |--------|-----------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------|
 | SCCD   | ![ devel](https://github.com/manquintero/sre-bootcamp-capstone-project/actions/workflows/sccd.yml/badge.svg?branch=devel) | ![ main](https://github.com/manquintero/sre-bootcamp-capstone-project/actions/workflows/sccd.yml/badge.svg) |
+| Docker | | ![ main](https://github.com/manquintero/sre-bootcamp-capstone-project/actions/workflows/docker.yml/badge.svg) |
