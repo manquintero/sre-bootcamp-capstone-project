@@ -22,6 +22,7 @@ If you have any questions, feel free to contact your mentor or one of us: Juan B
 ## Docker image
 ````sh
 docker pull manquintero/academy-sre-bootcamp-manuel-quintero
+docker run -d -p 8000:8000 manquintero/academy-sre-bootcamp-manuel-quintero
 ````
 
 ## Development environment
