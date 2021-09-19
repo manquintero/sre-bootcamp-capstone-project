@@ -1,2 +1,6 @@
 [run]
-omit = python/venv/*
+omit =
+    # Virtualenv
+    python/venv/*
+    # Flask
+    python/api.py

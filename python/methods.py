@@ -3,12 +3,10 @@
 
 import hashlib
 import os
-from http.client import FORBIDDEN
 
 import jwt
 import mysql.connector
 from jwt import DecodeError
-from flask import abort
 
 USEFUL_KEY = 'my2w7wjd7yXF64FIADfJxNs1oupTGAuW'
 
@@ -69,9 +67,6 @@ class Token:
                     key = os.getenv('JWT_TOKEN', USEFUL_KEY)
                     jwt_token = jwt.encode({'role': role}, key, algorithm="HS256")
             cursor.close()
-
-        if not jwt_token:
-            abort(FORBIDDEN)
 
         return jwt_token
 

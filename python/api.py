@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 """ SRE-BOOTCAMP-CAPSTONE-PROJECT """
-from http.client import UNAUTHORIZED
+from http.client import UNAUTHORIZED, FORBIDDEN
 
 from flask import Flask, jsonify, abort, request
 
@@ -30,12 +30,12 @@ def url_health():
 @app.route("/login", methods=['POST'])
 def url_login():
     """ Login page for POST verbs """
-    var1 = request.form['username']
-    var2 = request.form['password']
-    var3 = login.generate_token(var1, var2)
-    if not var3:
-        abort(UNAUTHORIZED)
-    response = {"data": var3}
+    username = request.form['username']
+    password = request.form['password']
+    token = login.generate_token(username, password)
+    if not token:
+        abort(FORBIDDEN)
+    response = dict(data=token)
     return jsonify(response)
 
 
@@ -57,11 +57,11 @@ def url_cidr_to_mask():
 @app.route("/mask-to-cidr")
 def url_mask_to_cidr():
     """ Convert subnet masks to their equivalent in CIDR """
-    var1 = request.headers.get('Authorization')
-    if not protected.access_data(var1):
+    authorization = request.headers.get('Authorization')
+    if not protected.access_data(authorization):
         abort(UNAUTHORIZED)
-    val = request.args.get('value')
-    response = {"function": "maskToCidr", "input": val, "output": mask_to_cidr(val), }
+    value = request.args.get('value')
+    response = dict(function="maskToCidr", input=value, output=mask_to_cidr(value))
     return jsonify(response)
 
 
