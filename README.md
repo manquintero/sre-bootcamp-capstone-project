@@ -33,6 +33,9 @@ docker-compose up --build
 ```
 This will bring the application container along with its database with sample data
 
+## Cloud Deployment
+This app is being manually deployed to CGP: https://academy-sre-bootcamp-manuel-quintero-zaoakzmfea-uc.a.run.app/
+
 ## Executing tests
 
 ### Get Token

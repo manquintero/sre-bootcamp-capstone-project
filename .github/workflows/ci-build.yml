@@ -71,10 +71,6 @@ jobs:
           context: ./python
           push: true
           tags: ${{ secrets.DOCKER_HUB_USERNAME }}/${{ env.IMAGE }}:latest
-        env:
-            DB_USERNAME: ${{ secrets.DB_USERNAME }}
-            DB_PASS: ${{ secrets.DB_PASS }}
-            JWT_TOKEN: ${{ secrets.JWT_TOKEN }}
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
   container_registry:
@@ -98,5 +94,6 @@ jobs:
             --build-arg GITHUB_REF="$GITHUB_REF" \
             ./python
       - name: Publish
+        if: ${{ github.event_name == 'pull_request' }}
         run: |-
           docker push "gcr.io/$PROJECT_ID/$IMAGE:latest"
