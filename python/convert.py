@@ -2,6 +2,7 @@
 """ This module contains utilities to convert and validate CIDR and Network Masks in IPv4 """
 import ipaddress
 import math
+import re
 
 MIN_BITS = 0
 MAX_BITS = 32
@@ -65,7 +66,12 @@ def mask_to_cidr(mask):
         mask_in_int = mask_in_int << BITS_BY_BLOCK
         mask_in_int = mask_in_int | block
 
-    # The bits are MAX_NUMB allowed minus the log2 of the difference in the complements)
+    # Verify blocks are consecutive greater than the next one
+    mask_in_bits = f'{mask_in_int:b}'
+    if re.search('01', mask_in_bits):
+        return INVALID
+
+    # The bits are MAX_NUMB allowed minus the log2 of the difference in the complements
     cidr_bits = int(MAX_BITS - math.log2(MAX_IP - mask_in_int))
 
     return str(cidr_bits)

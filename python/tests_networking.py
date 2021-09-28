@@ -87,6 +87,10 @@ class MaskToCidrTestCase(unittest.TestCase):
             '0.0.0.256',
             '256.0.0.0',
             '1',
+            '128.128.128.128',
+            '255.255.0.255',
+            '160.0.0.0',
+            '256.0.0.0',
         )
         for mask in test_cases:
             with self.subTest(mask):
