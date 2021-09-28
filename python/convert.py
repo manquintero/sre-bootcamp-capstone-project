@@ -12,11 +12,6 @@ BLOCK_MASK = (2 ** BITS_BY_BLOCK) - 1
 STEPS = MAX_BITS // BITS_BY_BLOCK
 INVALID = 'Invalid'
 
-# Possible values for a mask in a block, this is being a power of 2
-VALID_BLOCKS = [pow(2, i) for i in range(BITS_BY_BLOCK - 1, -1, -1)]
-# Maks are the sum of the greatest consecutive most significant bits
-VALID_MASKS = [sum(VALID_BLOCKS[0:i]) for i in range(len(VALID_BLOCKS)+1)]
-
 
 def cidr_to_mask(cidr: str):
     """ Convert from Classless Interdomain Routing (CIDR) to Mask
@@ -66,17 +61,13 @@ def mask_to_cidr(mask):
     # Get the blocks as integers
     blocks = [int(b) for b in mask.split('.', 4)]
 
-    # Verify all blocks within a mask have consecutive 1's
-    if any(b not in VALID_MASKS for b in blocks):
-        return INVALID
-
     mask_in_int = 0  # Accumulator
     for block in blocks:
         mask_in_int = mask_in_int << BITS_BY_BLOCK
         mask_in_int = mask_in_int | block
 
     # Verify blocks are consecutive greater than the next one
-    mask_in_bits = '{0:b}'.format(mask_in_int)
+    mask_in_bits = f'{mask_in_int:b}'
     if re.search('01', mask_in_bits):
         return INVALID
 
