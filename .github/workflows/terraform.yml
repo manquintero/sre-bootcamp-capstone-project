@@ -25,13 +25,3 @@ jobs:
         id: fmt
         run: |
           terraform -chdir=infrastructure/global/s3 fmt -check
-
-      - name: Terraform Init
-        id: init
-        run: |
-          terraform -chdir=infrastructure/global/s3 init
-      
-      - name: Terraform Validate
-        id: validate
-        run: |
-          terraform -chdir=infrastructure/global/s3 validate -no-color
