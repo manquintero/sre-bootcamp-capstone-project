@@ -3,8 +3,8 @@ provider "aws" {
 }
 
 locals {
-  name        = "sre-bootcamp-capstone-project"
-  environment = "dev"
+  name           = "sre-bootcamp-capstone-project"
+  environment    = "dev"
   resources_name = "${local.name}-${local.environment}"
 }
 

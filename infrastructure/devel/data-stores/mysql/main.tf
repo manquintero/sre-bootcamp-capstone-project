@@ -14,8 +14,8 @@ provider "aws" {
 }
 
 locals {
-  name = "sre-bootcamp"
-  environment = "devel"
+  name           = "sre-bootcamp"
+  environment    = "devel"
   resources_name = "${local.name}-db-${local.environment}"
 }
 
