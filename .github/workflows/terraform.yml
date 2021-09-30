@@ -24,4 +24,4 @@ jobs:
       - name: Terraform Format
         id: fmt
         run: |
-          terraform -chdir=infrastructure/global/s3 fmt -check
+          find infrastructure/ -name main.tf -exec dirname {} \; | xargs -L1 -i terraform -chdir={} fmt -check
