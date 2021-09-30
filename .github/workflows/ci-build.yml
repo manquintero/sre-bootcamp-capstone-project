@@ -9,8 +9,7 @@ name: CI
 env:
   PROJECT_ID: ${{ secrets.GKE_PROJECT }}
   IMAGE: academy-sre-bootcamp-manuel-quintero
-  # IMAGE_TAG: ${{ github.sha }}
-  IMAGE_TAG: "latest"
+  IMAGE_TAG: "latest" # ${{ github.sha }}
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -92,14 +91,14 @@ jobs:
       - name: Build
         run: |-
           docker build \
-            --tag "gcr.io/$PROJECT_ID/$IMAGE:${IMAGE_TAG}" \
+            --tag "gcr.io/${PROJECT_ID}/${{ env.IMAGE }}:${IMAGE_TAG}" \
             --build-arg GITHUB_SHA="latest" \
             --build-arg GITHUB_REF="$GITHUB_REF" \
             ./python
       - name: Publish
         if: ${{ github.event_name == 'pull_request' }}
         run: |-
-          docker push "gcr.io/$PROJECT_ID/$IMAGE:${IMAGE_TAG}"
+          docker push "gcr.io/${PROJECT_ID}/${{ env.IMAGE }}:${IMAGE_TAG}"
   ECR:
     needs: tests
     runs-on: ubuntu-latest
@@ -123,14 +122,13 @@ jobs:
         id: build-image
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: my-ecr-repo
         run: |
           # Build a docker container and
           # push it to ECR so that it can
           # be deployed to ECS.
-          docker build -t ${ECR_REGISTRY}/${ECR_REPOSITORY}:${IMAGE_TAG} ./python
-          # docker push ${ECR_REGISTRY}/${ECR_REPOSITORY}:${IMAGE_TAG}
-          # echo "::set-output name=image::${ECR_REGISTRY}/${ECR_REPOSITORY}:${IMAGE_TAG}"
+          docker build -t ${ECR_REGISTRY}/${{ env.IMAGE }}:${IMAGE_TAG} ./python
+          docker push ${ECR_REGISTRY}/${{ env.IMAGE }}:${IMAGE_TAG}
+          echo "::set-output name=image::${ECR_REGISTRY}/${{ env.IMAGE }}:${IMAGE_TAG}"
 
       # - name: Fill in the new image ID in the Amazon ECS task definition
       #   id: task-def
