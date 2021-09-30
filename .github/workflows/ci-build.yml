@@ -127,11 +127,10 @@ jobs:
           docker build -t ${ECR_REGISTRY}/${{ env.IMAGE }}:${IMAGE_TAG} ./python
           echo "::set-output name=image::${ECR_REGISTRY}/${{ env.IMAGE }}:${IMAGE_TAG}"
       - name: Publish to Amazon ECR
-        env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        if: ${{ github.event_name == 'pull_request' }}
         run: |
           # Push docker image to ECR so that it can be deployed to ECS.
-          docker push ${ECR_REGISTRY}/${{ env.IMAGE }}:${IMAGE_TAG}
+          docker push ${{ steps.login-ecr.outputs.registry }}/${{ env.IMAGE }}:${IMAGE_TAG}
 
       # - name: Fill in the new image ID in the Amazon ECS task definition
       #   id: task-def
