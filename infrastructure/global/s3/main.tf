@@ -1,9 +1,21 @@
+terraform {
+  backend "s3" {
+    bucket = "sre-bootcamp-capstone-project-terraform"
+    key    = "global/s3/terraform.tfstate"
+    region = "us-east-2"
+
+    dynamodb_table = "sre-bootcamp-capstone-project-terraform-locks"
+    encrypt        = true
+  }
+}
+
 provider "aws" {
   region = "us-east-2"
 }
 
 resource "aws_s3_bucket" "terraform_state" {
   bucket = "sre-bootcamp-capstone-project-terraform"
+
   # Prevent accidental deletion of this S3 bucket
   lifecycle {
     prevent_destroy = true
