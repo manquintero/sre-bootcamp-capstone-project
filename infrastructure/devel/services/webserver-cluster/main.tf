@@ -1,17 +1,38 @@
+terraform {
+  backend "s3" {
+    bucket = "sre-bootcamp-capstone-project-terraform"
+    key    = "devel/services/webserver-cluster/terraform.tfstate"
+    region = "us-east-2"
+
+    dynamodb_table = "sre-bootcamp-capstone-project-terraform-locks"
+    encrypt        = true
+  }
+}
+
 provider "aws" {
   region = "us-east-2"
 }
 
 locals {
-  name        = "sre-bootcamp-capstone-project"
-  environment = "dev"
-
-  # This is the convention we use to know what belongs to each other
-  ec2_resources_name = "${local.name}-${local.environment}"
+  name = "sre-bootcamp"
+  environment = "devel"
+  resource_name = "${local.name}-${local.environment}"
 }
 
 data "aws_availability_zones" "available" {
   state = "available"
+}
+
+module "webserver_cluster" {
+  source = "../../../modules/services/webserver-cluster"
+
+  cluster_name           = local.resource_name
+  db_remote_state_bucket = "${local.name}-db-${local.environment}"
+  db_remote_state_key    = "${local.environment}/data-stores/mysql/terraform.tfstate"
+
+  instance_type = "t2.micro"
+  min_size      = 2
+  max_size      = 2
 }
 
 module "vpc" {
@@ -31,114 +52,5 @@ module "vpc" {
   tags = {
     Environment = local.environment
     Name        = local.name
-  }
-}
-
-#----- ECS --------
-module "ecs" {
-  source             = "terraform-aws-modules/ecs/aws"
-  name               = local.name
-  container_insights = true
-
-  capacity_providers = ["FARGATE", "FARGATE_SPOT", aws_ecs_capacity_provider.prov1.name]
-
-  default_capacity_provider_strategy = [{
-    capacity_provider = aws_ecs_capacity_provider.prov1.name # "FARGATE_SPOT"
-    weight            = "1"
-  }]
-
-  tags = {
-    Environment = local.environment
-  }
-}
-
-module "ec2_profile" {
-  source = "terraform-aws-modules/ecs/aws//modules/ecs-instance-profile"
-
-  name = local.name
-
-  tags = {
-    Environment = local.environment
-  }
-}
-
-resource "aws_ecs_capacity_provider" "prov1" {
-  name = "prov1"
-
-  auto_scaling_group_provider {
-    auto_scaling_group_arn = module.asg.autoscaling_group_arn
-  }
-}
-
-#----- ECS  Services--------
-module "hello_world" {
-  source = "./service-hello-world"
-
-  cluster_id = module.ecs.ecs_cluster_id
-}
-
-#----- ECS  Resources--------
-
-#For now we only use the AWS ECS optimized ami <https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-optimized_AMI.html>
-data "aws_ami" "amazon_linux_ecs" {
-  most_recent = true
-
-  owners = ["amazon"]
-
-  filter {
-    name   = "name"
-    values = ["amzn-ami-*-amazon-ecs-optimized"]
-  }
-
-  filter {
-    name   = "owner-alias"
-    values = ["amazon"]
-  }
-}
-
-module "asg" {
-  source  = "terraform-aws-modules/autoscaling/aws"
-  version = "~> 4.0"
-
-  name = local.ec2_resources_name
-
-  # Launch configuration
-  lc_name   = local.ec2_resources_name
-  use_lc    = true
-  create_lc = true
-
-  image_id                  = data.aws_ami.amazon_linux_ecs.id
-  instance_type             = "t2.micro"
-  security_groups           = [module.vpc.default_security_group_id]
-  iam_instance_profile_name = module.ec2_profile.iam_instance_profile_id
-  user_data                 = data.template_file.user_data.rendered
-
-  # Auto scaling group
-  vpc_zone_identifier       = module.vpc.private_subnets
-  health_check_type         = "EC2"
-  min_size                  = 0
-  max_size                  = 2
-  desired_capacity          = 0 # we don't need them for the example
-  wait_for_capacity_timeout = 0
-
-  tags = [
-    {
-      key                 = "Environment"
-      value               = local.environment
-      propagate_at_launch = true
-    },
-    {
-      key                 = "Cluster"
-      value               = local.name
-      propagate_at_launch = true
-    },
-  ]
-}
-
-data "template_file" "user_data" {
-  template = file("${path.module}/templates/user-data.sh")
-
-  vars = {
-    cluster_name = local.name
   }
 }

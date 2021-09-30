@@ -13,9 +13,15 @@ provider "aws" {
   region = "us-east-2"
 }
 
+locals {
+  name = "sre-bootcamp"
+  environment = "devel"
+  resources_name = "${local.name}-db-${local.environment}"
+}
+
 module "datastore_mysql" {
   source            = "../../../modules/data-store/mysql"
-  db_instance_name  = "sre-bootcamp-capstone-project-terraform"
+  db_instance_name  = local.resources_name
   db_instance_class = "db.t2.micro"
   db_username       = "secret"
   db_password       = var.db_password
