@@ -51,9 +51,10 @@ jobs:
           pytest --cov-config=python/.coveragerc --cov python > pytest-coverage.txt
       - name: Comment coverage
         uses: coroo/pytest-coverage-commentator@v1.0.2
-  dockerhub:
+  DockerHub:
     needs: tests
     runs-on: ubuntu-latest
+    environment: development
     steps:
       - uses: actions/checkout@v2
       - name: Login to Docker Hub
@@ -73,7 +74,7 @@ jobs:
           tags: ${{ secrets.DOCKER_HUB_USERNAME }}/${{ env.IMAGE }}:latest
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
-  container_registry:
+  ContainerRegistry:
     needs: tests
     runs-on: ubuntu-latest
     environment: development
@@ -97,9 +98,8 @@ jobs:
         if: ${{ github.event_name == 'pull_request' }}
         run: |-
           docker push "gcr.io/$PROJECT_ID/$IMAGE:latest"
-  ecr:
+  ECR:
     needs: tests
-    name: Deploy
     runs-on: ubuntu-latest
     environment: development
     steps:
