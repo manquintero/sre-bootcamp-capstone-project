@@ -37,3 +37,8 @@ variable "environment" {
   description = "Categorize the environment in a Tag"
   type        = string
 }
+
+variable "vpc_security_group_ids" {
+  description = "A list of security group IDs to associate with"
+  type        = list(string)
+}

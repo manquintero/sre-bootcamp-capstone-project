@@ -54,11 +54,11 @@ module "vpc" {
   }
 }
 
-# module "asg" {
-#   source     = "../../../modules/cluster/asg"
-#   vpc_id     = module.vpc.vpc_id
-#   subnet_ids = module.vpc.public_subnets
-# }
+module "asg" {
+  source     = "../../../modules/cluster/asg"
+  vpc_id     = module.vpc.vpc_id
+  subnet_ids = module.vpc.public_subnets
+}
 
 # module "ecs" {
 #   source = "../../../modules/cluster/ecs"
@@ -78,7 +78,8 @@ module "data-store" {
   db_password               = var.db_password
 
   # Networking and security
-  db_subnets          = module.vpc.database_subnets
-  publicly_accessible = true
+  db_subnets             = module.vpc.database_subnets
+  publicly_accessible    = true
+  vpc_security_group_ids = [module.asg.aws_security_group_rds_sg_id]
   # vpc_security_group_ids = [module.asg.aws_security_group_rds_sg_id, module.asg.aws_security_group_ecs_sg_id]
 }
