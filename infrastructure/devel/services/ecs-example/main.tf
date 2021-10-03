@@ -1,13 +1,13 @@
-terraform {
-  backend "s3" {
-    bucket = "sre-bootcamp-capstone-project-terraform"
-    key    = "devel/services/ecs-example/terraform.tfstate"
-    region = "us-east-2"
+# terraform {
+#   backend "s3" {
+#     bucket = "sre-bootcamp-capstone-project-terraform"
+#     key    = "devel/services/ecs-example/terraform.tfstate"
+#     region = "us-east-2"
 
-    dynamodb_table = "sre-bootcamp-capstone-project-terraform-locks"
-    encrypt        = true
-  }
-}
+#     dynamodb_table = "sre-bootcamp-capstone-project-terraform-locks"
+#     encrypt        = true
+#   }
+# }
 
 provider "aws" {
   region = "us-east-2"
@@ -55,14 +55,16 @@ module "vpc" {
 }
 
 module "asg" {
-  source     = "../../../modules/cluster/asg"
-  vpc_id     = module.vpc.vpc_id
-  subnet_ids = module.vpc.public_subnets
+  source              = "../../../modules/cluster/asg"
+  vpc_id              = module.vpc.vpc_id
+  vpc_zone_identifier = module.vpc.public_subnets
 }
 
-# module "ecs" {
-#   source = "../../../modules/cluster/ecs"
-# }
+module "ecs" {
+  source = "../../../modules/cluster/ecs"
+
+  app_name = "teporingo"
+}
 
 module "data-store" {
   source = "../../../modules/data-store/mysql"

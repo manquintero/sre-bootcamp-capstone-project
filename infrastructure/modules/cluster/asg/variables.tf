@@ -3,7 +3,7 @@ variable "vpc_id" {
   type        = string
 }
 
-variable "subnet_ids" {
-  description = "the subnet IDs to deploy to"
+variable "vpc_zone_identifier" {
+  description = "A list of subnet IDs to launch resources in."
   type        = list(string)
 }
