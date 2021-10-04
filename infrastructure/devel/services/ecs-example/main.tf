@@ -1,13 +1,13 @@
-# terraform {
-#   backend "s3" {
-#     bucket = "sre-bootcamp-capstone-project-terraform"
-#     key    = "devel/services/ecs-example/terraform.tfstate"
-#     region = "us-east-2"
+terraform {
+  backend "s3" {
+    bucket = "sre-bootcamp-capstone-project-terraform"
+    key    = "devel/services/ecs-example/terraform.tfstate"
+    region = "us-east-2"
 
-#     dynamodb_table = "sre-bootcamp-capstone-project-terraform-locks"
-#     encrypt        = true
-#   }
-# }
+    dynamodb_table = "sre-bootcamp-capstone-project-terraform-locks"
+    encrypt        = true
+  }
+}
 
 provider "aws" {
   region = "us-east-2"
