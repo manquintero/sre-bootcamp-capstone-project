@@ -124,22 +124,22 @@ module "asg" {
   host_port     = local.host_port
 }
 
-# # module "data-store" {
-# #   source = "../../../modules/data-store/mysql"
+# module "data-store" {
+#   source = "../../../modules/data-store/mysql"
 
-# #   # Tags
-# #   environment = local.environment
+#   # Tags
+#   environment = local.environment
 
-# #   # Attributes
-# #   identifier_prefix         = local.resource_name
-# #   final_snapshot_identifier = "${local.resource_name}-final"
-# #   db_username               = "secret"
-# #   instance_class            = "db.t2.micro"
-# #   db_password               = var.db_password
+#   # Attributes
+#   identifier_prefix         = local.resource_name
+#   final_snapshot_identifier = "${local.resource_name}-final"
+#   db_username               = "secret"
+#   instance_class            = "db.t2.micro"
+#   db_password               = var.db_password
 
-# #   # Networking and security
-# #   db_subnets             = module.vpc.database_subnets
-# #   publicly_accessible    = true
-# #   vpc_security_group_ids = [module.asg.aws_security_group_rds_sg_id]
-# #   # vpc_security_group_ids = [module.asg.aws_security_group_rds_sg_id, module.asg.aws_security_group_ecs_sg_id]
-# # }
+#   # Networking and security
+#   db_subnets             = module.vpc.database_subnets
+#   publicly_accessible    = true
+#   vpc_security_group_ids = [module.asg.aws_security_group_rds_sg_id]
+#   # vpc_security_group_ids = [module.asg.aws_security_group_rds_sg_id, module.asg.aws_security_group_ecs_sg_id]
+# }
