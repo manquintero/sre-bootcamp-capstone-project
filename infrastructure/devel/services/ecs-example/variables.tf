@@ -1,9 +1,5 @@
 variable "db_password" {
   description = "The password for the database"
   type        = string
+  sensitive   = true
 }
-
-# variable "server_port" {
-#   description = "The port the server will use for HTTP requests"
-#   type        = number
-# }
