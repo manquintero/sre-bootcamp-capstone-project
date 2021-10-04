@@ -6,48 +6,13 @@ locals {
   all_ips      = ["0.0.0.0/0"]
 }
 
-data "aws_vpc" "default" {
-  default = true
-}
-
-data "aws_subnet_ids" "default" {
-  vpc_id = data.aws_vpc.default.id
-}
-
-data "terraform_remote_state" "db" {
-  backend = "s3"
-
-  config = {
-    bucket = var.db_remote_state_bucket
-    key    = var.db_remote_state_key
-    region = "us-east-2"
-  }
-}
-
 data "template_file" "user_data" {
-  template = file("${path.module}/user-data.sh")
+  template = file("${path.module}/task_definition.json.tpl")
 
   vars = {
     "server_port" = var.server_port
     "db_address"  = data.terraform_remote_state.db.outputs.address
     "db_port"     = data.terraform_remote_state.db.outputs.port
-  }
-}
-
-#For now we only use the AWS ECS optimized ami <https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-optimized_AMI.html>
-data "aws_ami" "amazon_linux_ecs" {
-  most_recent = true
-
-  owners = ["amazon"]
-
-  filter {
-    name   = "name"
-    values = ["amzn-ami-*-amazon-ecs-optimized"]
-  }
-
-  filter {
-    name   = "owner-alias"
-    values = ["amazon"]
   }
 }
 

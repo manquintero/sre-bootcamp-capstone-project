@@ -14,9 +14,13 @@ provider "aws" {
 }
 
 locals {
-  environment   = "dev"
-  name          = "sre-bootcamp"
-  resource_name = "${local.name}-${local.environment}"
+  environment     = "dev"
+  name            = "sre-bootcamp"
+  resource_name   = "${local.name}-${local.environment}"
+  container_port  = 80
+  host_port       = 8080
+  container_name  = "apache"
+  server_protocol = "HTTP"
 }
 
 data "aws_availability_zones" "available" {
@@ -27,7 +31,7 @@ module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
   version = "~> 3.0"
 
-  name = "Test"
+  name = "${local.name}-vpc"
 
   cidr = "10.0.0.0/24"
 
@@ -54,34 +58,88 @@ module "vpc" {
   }
 }
 
-module "asg" {
-  source              = "../../../modules/cluster/asg"
-  vpc_id              = module.vpc.vpc_id
-  vpc_zone_identifier = module.vpc.public_subnets
+module "alb" {
+  source = "../../../modules/networking/alb"
+
+  alb_name   = "${local.name}-${local.environment}"
+  vpc_id     = module.vpc.vpc_id
+  subnet_ids = module.vpc.public_subnets
+}
+
+resource "aws_lb_target_group" "lbtg" {
+  name     = "${local.name}-lbtg"
+  port     = local.host_port
+  protocol = local.server_protocol
+  vpc_id   = module.vpc.vpc_id
+
+  health_check {
+    path                = "/"
+    protocol            = "HTTP"
+    matcher             = "200"
+    interval            = 15
+    timeout             = 3
+    healthy_threshold   = 2
+    unhealthy_threshold = 2
+  }
+}
+
+resource "aws_lb_listener_rule" "asg" {
+  listener_arn = module.alb.alb_http_listener_arn
+  priority     = 100
+
+  condition {
+    path_pattern {
+      values = ["*"]
+    }
+  }
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.lbtg.arn
+  }
 }
 
 module "ecs" {
   source = "../../../modules/cluster/ecs"
-
-  app_name = "teporingo"
+  # ECR
+  repository = "academy-${local.name}-manuel-quintero"
+  # Cluster
+  app_name       = "teporingo"
+  container_port = local.container_port
+  container_name = local.container_name
+  host_port      = local.host_port
+  # Load Balancer
+  aws_lb_target_group_arn = aws_lb_target_group.lbtg.arn
 }
 
-module "data-store" {
-  source = "../../../modules/data-store/mysql"
+module "asg" {
+  source = "../../../modules/cluster/asg"
 
-  # Tags
-  environment = local.environment
-
-  # Attributes
-  identifier_prefix         = local.resource_name
-  final_snapshot_identifier = "${local.resource_name}-final"
-  db_username               = "secret"
-  instance_class            = "db.t2.micro"
-  db_password               = var.db_password
-
-  # Networking and security
-  db_subnets             = module.vpc.database_subnets
-  publicly_accessible    = true
-  vpc_security_group_ids = [module.asg.aws_security_group_rds_sg_id]
-  # vpc_security_group_ids = [module.asg.aws_security_group_rds_sg_id, module.asg.aws_security_group_ecs_sg_id]
+  vpc_id                = module.vpc.vpc_id
+  vpc_zone_identifier   = module.vpc.public_subnets
+  target_group_arns     = [aws_lb_target_group.lbtg.arn]
+  alb_security_group_id = module.alb.alb_security_group_id
+  # Launch configuration
+  instance_type = "t2.micro"
+  cluster_name  = module.ecs.cluster_name
+  host_port     = local.host_port
 }
+
+# # module "data-store" {
+# #   source = "../../../modules/data-store/mysql"
+
+# #   # Tags
+# #   environment = local.environment
+
+# #   # Attributes
+# #   identifier_prefix         = local.resource_name
+# #   final_snapshot_identifier = "${local.resource_name}-final"
+# #   db_username               = "secret"
+# #   instance_class            = "db.t2.micro"
+# #   db_password               = var.db_password
+
+# #   # Networking and security
+# #   db_subnets             = module.vpc.database_subnets
+# #   publicly_accessible    = true
+# #   vpc_security_group_ids = [module.asg.aws_security_group_rds_sg_id]
+# #   # vpc_security_group_ids = [module.asg.aws_security_group_rds_sg_id, module.asg.aws_security_group_ecs_sg_id]
+# # }

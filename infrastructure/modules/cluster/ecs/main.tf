@@ -1,5 +1,13 @@
+data "template_file" "task_definition_template" {
+  template = file("${path.module}/templates/task_definition.json.tpl")
+  vars = {
+    "container_port" = var.container_port
+    "host_port"      = var.host_port
+  }
+}
+
 resource "aws_ecr_repository" "ecr" {
-  name = var.app_name
+  name = var.repository
 }
 
 resource "aws_ecs_cluster" "ecs_cluster" {
@@ -7,25 +15,11 @@ resource "aws_ecs_cluster" "ecs_cluster" {
 }
 
 resource "aws_ecs_task_definition" "task_definition" {
-  family = var.app_name
-  # container_definitions = "${file("task-definitions/service.json")}"
-  # container_definitions = data.template_file.task_definition_template.rendered
-  container_definitions = <<EOF
-[
-  {
-    "name": "nginx",
-    "image": "nginx:1.13-alpine",
-    "essential": true,
-    "portMappings": [
-      {
-        "containerPort": 80
-      }
-    ],
-    "memory": 128,
-    "cpu": 100
+  family                = var.app_name
+  container_definitions = data.template_file.task_definition_template.rendered
+  tags = {
+    Name = var.app_name
   }
-]
-EOF
 }
 
 resource "aws_ecs_service" "app" {
@@ -33,4 +27,10 @@ resource "aws_ecs_service" "app" {
   cluster         = aws_ecs_cluster.ecs_cluster.id
   task_definition = aws_ecs_task_definition.task_definition.arn
   desired_count   = 2
+
+  load_balancer {
+    target_group_arn = var.aws_lb_target_group_arn
+    container_name   = var.container_name
+    container_port   = var.container_port
+  }
 }
