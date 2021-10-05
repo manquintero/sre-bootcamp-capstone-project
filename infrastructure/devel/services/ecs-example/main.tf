@@ -22,8 +22,7 @@ locals {
   # container_port = 8000
   host_port      = 8080
   # host_port             = 80
-  container_name  = "nginx"
-  # container_name = "sre-bootcamp"
+  container_name = "sre-bootcamp"
   container_image = "nginx:latest"
   # container_image       = "docker.io/manquintero/academy-sre-bootcamp-manuel-quintero:latest"
   server_protocol       = "HTTP"
