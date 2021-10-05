@@ -4,10 +4,10 @@ output "alb_dns_name" {
   description = "The domain name of the load balancer"
 }
 
-# # ECR
-# output "ecr_repository_worker_endpoint" {
-#   value = module.ecs.repository_url
-# }
+# ECR
+output "ecr_repository_worker_endpoint" {
+  value = module.ecr.repository_url
+}
 
 # Data Store
 # output "mysql_endpoint" {

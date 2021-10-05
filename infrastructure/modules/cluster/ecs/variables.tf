@@ -1,7 +1,3 @@
-variable "repository" {
-  description = "Name of the repository"
-  type        = string
-}
 variable "app_name" {
   description = "Name of the container to be run"
   type        = string

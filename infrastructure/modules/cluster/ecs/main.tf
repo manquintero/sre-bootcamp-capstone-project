@@ -8,10 +8,6 @@ data "template_file" "task_definition_template" {
   }
 }
 
-resource "aws_ecr_repository" "ecr" {
-  name = var.repository
-}
-
 resource "aws_ecs_cluster" "ecs_cluster" {
   name = "${var.app_name}-cluster"
 }

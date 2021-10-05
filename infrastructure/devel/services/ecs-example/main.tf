@@ -18,13 +18,10 @@ locals {
   app_name       = "api"
   name           = "sre-bootcamp"
   resource_name  = "${local.name}-${local.environment}"
-  container_port = 80
-  # container_port = 8000
-  host_port = 8080
-  # host_port             = 80
-  container_name  = "sre-bootcamp"
-  container_image = "nginx:latest"
-  # container_image       = "manquintero/academy-sre-bootcamp-manuel-quintero:latest"
+  host_port      = 8080
+  container_name = "sre-bootcamp"
+  container_port  = 8000
+
   server_protocol       = "HTTP"
   ec2_min_size          = 2
   ec2_max_size          = 2
@@ -109,15 +106,18 @@ resource "aws_lb_listener_rule" "asg" {
   }
 }
 
+module "ecr" {
+  source = "../../../modules/container/ecr"
+  repository = "academy-${local.name}-manuel-quintero"
+}
+
 module "ecs" {
   source = "../../../modules/cluster/ecs"
-  # ECR
-  repository = "academy-${local.name}-manuel-quintero"
   # Cluster
   app_name        = local.app_name
   container_port  = local.container_port
   container_name  = local.container_name
-  container_image = local.container_image
+  container_image = module.ecr.repository_url
   host_port       = local.host_port
   desired_count   = local.desired_ecs_count
   # Load Balancer
