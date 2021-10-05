@@ -17,6 +17,11 @@ variable "container_name" {
   type        = string
 }
 
+variable "container_image" {
+  description = "Name of the container image"
+  type        = string
+}
+
 variable "container_port" {
   description = "The port number on the container that is bound to the user-specified or automatically assigned host port"
   type        = number
@@ -24,5 +29,10 @@ variable "container_port" {
 
 variable "host_port" {
   description = "The port number on the container instance to reserve for your container"
+  type        = number
+}
+
+variable "desired_count" {
+  description = "Number of instances of the task definition to place and keep running"
   type        = number
 }

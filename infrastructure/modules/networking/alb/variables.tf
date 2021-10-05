@@ -12,3 +12,8 @@ variable "subnet_ids" {
   description = "A list of subnet IDs to attach to the LB"
   type        = list(string)
 }
+
+variable "environment" {
+  description = "Categorize the environment in a Tag"
+  type        = string
+}

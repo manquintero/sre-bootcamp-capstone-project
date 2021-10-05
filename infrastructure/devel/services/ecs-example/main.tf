@@ -1,26 +1,32 @@
-terraform {
-  backend "s3" {
-    bucket = "sre-bootcamp-capstone-project-terraform"
-    key    = "devel/services/ecs-example/terraform.tfstate"
-    region = "us-east-2"
+# terraform {
+#   backend "s3" {
+#     bucket = "sre-bootcamp-capstone-project-terraform"
+#     key    = "devel/services/ecs-example/terraform.tfstate"
+#     region = "us-east-2"
 
-    dynamodb_table = "sre-bootcamp-capstone-project-terraform-locks"
-    encrypt        = true
-  }
-}
+#     dynamodb_table = "sre-bootcamp-capstone-project-terraform-locks"
+#     encrypt        = true
+#   }
+# }
 
 provider "aws" {
   region = "us-east-2"
 }
 
 locals {
-  environment     = "dev"
-  name            = "sre-bootcamp"
-  resource_name   = "${local.name}-${local.environment}"
-  container_port  = 80
-  host_port       = 8080
-  container_name  = "apache"
-  server_protocol = "HTTP"
+  environment           = "dev"
+  app_name              = "teporingo"
+  name                  = "sre-bootcamp"
+  resource_name         = "${local.name}-${local.environment}"
+  container_port        = 80
+  host_port             = 8080
+  container_name        = "nginx"
+  container_image       = "nginx:latest"
+  server_protocol       = "HTTP"
+  ec2_min_size          = 2
+  ec2_max_size          = 2
+  ec2_health_check_type = "ELB"
+  desired_ecs_count     = 2
 }
 
 data "aws_availability_zones" "available" {
@@ -36,8 +42,9 @@ module "vpc" {
   cidr = "10.0.0.0/24"
 
   azs              = [data.aws_availability_zones.available.names[0], data.aws_availability_zones.available.names[1]]
-  public_subnets   = ["10.0.0.0/26", "10.0.0.64/26"]
-  database_subnets = ["10.0.0.128/26", "10.0.0.192/26"]
+  public_subnets   = ["10.0.0.0/27", "10.0.0.32/27"]
+  private_subnets  = ["10.0.0.64/27", "10.0.0.96/27"]
+  database_subnets = ["10.0.0.128/27", "10.0.0.160/27"]
 
   # Public access to RDS instances
   create_database_subnet_group           = true
@@ -61,9 +68,10 @@ module "vpc" {
 module "alb" {
   source = "../../../modules/networking/alb"
 
-  alb_name   = "${local.name}-${local.environment}"
-  vpc_id     = module.vpc.vpc_id
-  subnet_ids = module.vpc.public_subnets
+  alb_name    = "${local.name}-${local.environment}"
+  vpc_id      = module.vpc.vpc_id
+  subnet_ids  = module.vpc.public_subnets
+  environment = local.environment
 }
 
 resource "aws_lb_target_group" "lbtg" {
@@ -103,10 +111,12 @@ module "ecs" {
   # ECR
   repository = "academy-${local.name}-manuel-quintero"
   # Cluster
-  app_name       = "teporingo"
-  container_port = local.container_port
-  container_name = local.container_name
-  host_port      = local.host_port
+  app_name        = local.app_name
+  container_port  = local.container_port
+  container_name  = local.container_name
+  container_image = local.container_image
+  host_port       = local.host_port
+  desired_count   = local.desired_ecs_count
   # Load Balancer
   aws_lb_target_group_arn = aws_lb_target_group.lbtg.arn
 }
@@ -114,14 +124,19 @@ module "ecs" {
 module "asg" {
   source = "../../../modules/cluster/asg"
 
+  # Module config
   vpc_id                = module.vpc.vpc_id
-  vpc_zone_identifier   = module.vpc.public_subnets
-  target_group_arns     = [aws_lb_target_group.lbtg.arn]
   alb_security_group_id = module.alb.alb_security_group_id
   # Launch configuration
   instance_type = "t2.micro"
   cluster_name  = module.ecs.cluster_name
   host_port     = local.host_port
+  # Auto-Scale
+  vpc_zone_identifier = module.vpc.public_subnets
+  target_group_arns   = [aws_lb_target_group.lbtg.arn]
+  min_size            = local.ec2_min_size
+  max_size            = local.ec2_max_size
+  health_check_type   = local.ec2_health_check_type
 }
 
 # module "data-store" {

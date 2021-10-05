@@ -32,3 +32,19 @@ variable "alb_security_group_id" {
   description = "Security group id to allow access to/from"
   type        = string
 }
+
+variable "min_size" {
+  description = "The minimum number of EC2 Instances in the ASG"
+  type        = number
+}
+
+variable "max_size" {
+  description = "The maximum number of EC2 Instances in the ASG"
+  type        = number
+}
+
+variable "health_check_type" {
+  description = "The type of health check to perform. Must be one of: EC2, ELB."
+  type        = string
+  default     = "EC2"
+}

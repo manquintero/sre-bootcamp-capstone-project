@@ -59,7 +59,9 @@ resource "aws_security_group_rule" "lb_out" {
 }
 
 resource "aws_security_group" "ecs_sg" {
-  vpc_id = var.vpc_id
+  name        = "ecs_sg"
+  description = "Elastic Container Service Security Group"
+  vpc_id      = var.vpc_id
 }
 
 # Allow the containers to receive packets from the LB
@@ -90,7 +92,9 @@ resource "aws_security_group_rule" "service_out" {
 }
 
 resource "aws_security_group" "rds_sg" {
-  vpc_id = var.vpc_id
+  name        = "rds_sg"
+  description = "Relational Database Service Security Group"
+  vpc_id      = var.vpc_id
 }
 
 resource "aws_security_group_rule" "allow_sql_alb_inbound" {
@@ -119,8 +123,9 @@ resource "aws_iam_role_policy_attachment" "ecs_agent" {
 }
 
 resource "aws_launch_configuration" "ecs_launch_config" {
-  image_id      = data.aws_ami.amazon_linux_ecs.id
-  instance_type = var.instance_type
+  image_id                    = data.aws_ami.amazon_linux_ecs.id
+  instance_type               = var.instance_type
+  associate_public_ip_address = false
 
   iam_instance_profile = aws_iam_instance_profile.ecs_agent.name
   security_groups      = [aws_security_group.ecs_sg.id]
@@ -138,11 +143,20 @@ resource "aws_autoscaling_group" "asg" {
 
   vpc_zone_identifier  = var.vpc_zone_identifier
   launch_configuration = aws_launch_configuration.ecs_launch_config.name
-  target_group_arns    = var.target_group_arns
 
-  desired_capacity          = 2
-  min_size                  = 1
-  max_size                  = 10
-  health_check_grace_period = 300
-  health_check_type         = "ELB"
+  min_size = var.min_size
+  max_size = var.max_size
+
+  # Wait for at least this many instances to pass health checks before considering the ASG deployment complete
+  min_elb_capacity = var.min_size
+
+  # Configure integrations with a load balancer
+  target_group_arns = var.target_group_arns
+  health_check_type = var.health_check_type
+
+  tag {
+    key                 = "Name"
+    value               = var.cluster_name
+    propagate_at_launch = true
+  }
 }

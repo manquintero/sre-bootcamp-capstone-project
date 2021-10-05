@@ -1,7 +1,7 @@
 [
   {
-    "name": "apache",
-    "image": "httpd",
+    "name": "${container_name}",
+    "image": "${container_image}",
     "portMappings": [
       {
         "containerPort": ${container_port},
