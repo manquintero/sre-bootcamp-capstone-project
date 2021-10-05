@@ -1,13 +1,13 @@
-# terraform {
-#   backend "s3" {
-#     bucket = "sre-bootcamp-capstone-project-terraform"
-#     key    = "devel/services/ecs-example/terraform.tfstate"
-#     region = "us-east-2"
+terraform {
+  backend "s3" {
+    bucket = "sre-bootcamp-capstone-project-terraform"
+    key    = "devel/services/ecs-example/terraform.tfstate"
+    region = "us-east-2"
 
-#     dynamodb_table = "sre-bootcamp-capstone-project-terraform-locks"
-#     encrypt        = true
-#   }
-# }
+    dynamodb_table = "sre-bootcamp-capstone-project-terraform-locks"
+    encrypt        = true
+  }
+}
 
 provider "aws" {
   region = "us-east-2"
@@ -20,7 +20,7 @@ locals {
   resource_name  = "${local.name}-${local.environment}"
   host_port      = 8080
   container_name = "sre-bootcamp"
-  container_port  = 8000
+  container_port = 8000
 
   server_protocol       = "HTTP"
   ec2_min_size          = 2
@@ -107,7 +107,7 @@ resource "aws_lb_listener_rule" "asg" {
 }
 
 module "ecr" {
-  source = "../../../modules/container/ecr"
+  source     = "../../../modules/container/ecr"
   repository = "academy-${local.name}-manuel-quintero"
 }
 
