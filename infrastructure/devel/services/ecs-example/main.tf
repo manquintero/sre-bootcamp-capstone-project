@@ -14,14 +14,18 @@ provider "aws" {
 }
 
 locals {
-  environment           = "dev"
-  app_name              = "teporingo"
-  name                  = "sre-bootcamp"
-  resource_name         = "${local.name}-${local.environment}"
-  container_port        = 80
-  host_port             = 8080
-  container_name        = "nginx"
-  container_image       = "nginx:latest"
+  environment   = "dev"
+  app_name      = "api"
+  name          = "sre-bootcamp"
+  resource_name = "${local.name}-${local.environment}"
+  container_port  = 80
+  # container_port = 8000
+  host_port      = 8080
+  # host_port             = 80
+  container_name  = "nginx"
+  # container_name = "sre-bootcamp"
+  container_image = "nginx:latest"
+  # container_image       = "docker.io/manquintero/academy-sre-bootcamp-manuel-quintero:latest"
   server_protocol       = "HTTP"
   ec2_min_size          = 2
   ec2_max_size          = 2
@@ -128,9 +132,10 @@ module "asg" {
   vpc_id                = module.vpc.vpc_id
   alb_security_group_id = module.alb.alb_security_group_id
   # Launch configuration
-  instance_type = "t2.micro"
-  cluster_name  = module.ecs.cluster_name
-  host_port     = local.host_port
+  instance_type        = "t2.micro"
+  cluster_name         = module.ecs.cluster_name
+  host_port            = local.host_port
+  launch_config_prefix = local.app_name
   # Auto-Scale
   vpc_zone_identifier = module.vpc.public_subnets
   target_group_arns   = [aws_lb_target_group.lbtg.arn]

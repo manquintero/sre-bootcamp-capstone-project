@@ -48,3 +48,8 @@ variable "health_check_type" {
   type        = string
   default     = "EC2"
 }
+
+variable "launch_config_prefix" {
+  description = "Creates a unique name beginning with the specified prefix"
+  type        = string
+}

@@ -1,7 +1,5 @@
 locals {
   any_port     = 0
-  ssh_port     = 22
-  http_port    = 80
   sql_port     = 3306
   https_port   = 443
   tcp_protocol = "tcp"
@@ -123,6 +121,7 @@ resource "aws_iam_role_policy_attachment" "ecs_agent" {
 }
 
 resource "aws_launch_configuration" "ecs_launch_config" {
+  name_prefix                 = "${var.launch_config_prefix}-"
   image_id                    = data.aws_ami.amazon_linux_ecs.id
   instance_type               = var.instance_type
   associate_public_ip_address = false
@@ -148,7 +147,7 @@ resource "aws_autoscaling_group" "asg" {
   max_size = var.max_size
 
   # Wait for at least this many instances to pass health checks before considering the ASG deployment complete
-  min_elb_capacity = var.min_size
+  # min_elb_capacity = var.min_size
 
   # Configure integrations with a load balancer
   target_group_arns = var.target_group_arns
