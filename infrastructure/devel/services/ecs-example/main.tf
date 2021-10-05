@@ -14,17 +14,17 @@ provider "aws" {
 }
 
 locals {
-  environment   = "dev"
-  app_name      = "api"
-  name          = "sre-bootcamp"
-  resource_name = "${local.name}-${local.environment}"
-  container_port  = 80
+  environment    = "dev"
+  app_name       = "api"
+  name           = "sre-bootcamp"
+  resource_name  = "${local.name}-${local.environment}"
+  container_port = 80
   # container_port = 8000
-  host_port      = 8080
+  host_port = 8080
   # host_port             = 80
-  container_name = "sre-bootcamp"
+  container_name  = "sre-bootcamp"
   container_image = "nginx:latest"
-  # container_image       = "docker.io/manquintero/academy-sre-bootcamp-manuel-quintero:latest"
+  # container_image       = "manquintero/academy-sre-bootcamp-manuel-quintero:latest"
   server_protocol       = "HTTP"
   ec2_min_size          = 2
   ec2_max_size          = 2
