@@ -1,3 +1,8 @@
+variable "vpc_id" {
+  description = "VCP identifier"
+  type        = string
+}
+
 variable "identifier_prefix" {
   description = "Creates a unique identifier beginning with the specified prefix"
   type        = string
@@ -39,6 +44,6 @@ variable "environment" {
 }
 
 variable "vpc_security_group_ids" {
-  description = "A list of security group IDs to associate with"
-  type        = list(string)
+  description = "Security group IDs to associate with"
+  type        = string
 }

@@ -1,6 +1,5 @@
 locals {
   any_port     = 0
-  sql_port     = 3306
   https_port   = 443
   tcp_protocol = "tcp"
   any_protocol = "-1"
@@ -18,7 +17,7 @@ data "aws_iam_policy_document" "ecs_agent" {
   }
 }
 
-#For now we only use the AWS ECS optimized ami <https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-optimized_AMI.html>
+# For now we only use the AWS ECS optimized ami <https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-optimized_AMI.html>
 data "aws_ami" "amazon_linux_ecs" {
   most_recent = true
 
@@ -87,22 +86,6 @@ resource "aws_security_group_rule" "service_out" {
   cidr_blocks = local.all_ips
 
   security_group_id = aws_security_group.ecs_sg.id
-}
-
-resource "aws_security_group" "rds_sg" {
-  name        = "rds_sg"
-  description = "Relational Database Service Security Group"
-  vpc_id      = var.vpc_id
-}
-
-resource "aws_security_group_rule" "allow_sql_alb_inbound" {
-  type              = "ingress"
-  security_group_id = aws_security_group.rds_sg.id
-
-  from_port   = local.sql_port
-  to_port     = local.sql_port
-  protocol    = local.tcp_protocol
-  cidr_blocks = local.all_ips
 }
 
 resource "aws_iam_role" "ecs_agent" {

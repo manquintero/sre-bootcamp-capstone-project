@@ -23,6 +23,16 @@ variable "container_port" {
   type        = number
 }
 
+variable "container_memory" {
+  default = 128
+  type    = number
+}
+
+variable "container_cpu" {
+  default = 100
+  type    = number
+}
+
 variable "host_port" {
   description = "The port number on the container instance to reserve for your container"
   type        = number
@@ -31,4 +41,20 @@ variable "host_port" {
 variable "desired_count" {
   description = "Number of instances of the task definition to place and keep running"
   type        = number
+}
+
+variable "db_host" {
+  description = "The hostname of the RDS instance"
+  sensitive   = true
+}
+
+variable "db_username" {
+  description = "The username of the RDS instance"
+  sensitive   = true
+}
+
+variable "db_password_arn" {
+  default     = ""
+  description = "name or ARN of a secrets manager secret (arn:aws:secretsmanager:region:aws_account_id:secret:secret_name)"
+  type        = string
 }
