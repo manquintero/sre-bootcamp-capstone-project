@@ -94,8 +94,8 @@ resource "aws_ecs_task_definition" "task_definition" {
   family                = var.app_name
   container_definitions = data.template_file.task_definition_template.rendered
   # Roles
-  execution_role_arn       = aws_iam_role.execution.arn
-  task_role_arn            = aws_iam_role.task.arn
+  execution_role_arn = aws_iam_role.execution.arn
+  task_role_arn      = aws_iam_role.task.arn
 
   tags = {
     Name = var.app_name
