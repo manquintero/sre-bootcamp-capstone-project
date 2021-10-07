@@ -33,8 +33,8 @@ variable "db_username" {
   type        = string
 }
 
-variable "db_password" {
-  description = "The password for the database"
+variable "db_password_secret_id" {
+  description = "Specifies the secret containing the version that you want to retrieve. You can specify either the Amazon Resource Name (ARN) or the friendly name of the secret"
   type        = string
 }
 

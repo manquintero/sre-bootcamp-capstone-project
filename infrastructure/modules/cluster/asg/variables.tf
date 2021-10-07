@@ -53,3 +53,8 @@ variable "launch_config_prefix" {
   description = "Creates a unique name beginning with the specified prefix"
   type        = string
 }
+
+variable "enable_autoscaling" {
+  description = "If set to true, enable auto scaling"
+  type        = bool
+}

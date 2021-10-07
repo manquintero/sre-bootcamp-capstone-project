@@ -74,7 +74,7 @@ module "datastore" {
   final_snapshot_identifier = "${var.project}-${var.environment}-final"
   db_username               = local.db_username
   instance_class            = var.db_instance_class
-  db_password               = module.secrets.db_password
+  db_password_secret_id     = module.secrets.db_password_secret_arn
 
   # Networking and security
   vpc_id                 = var.vpc_id
@@ -119,4 +119,5 @@ module "asg" {
   min_size            = var.asg_min_size
   max_size            = var.asg_max_size
   health_check_type   = local.ec2_health_check_type
+  enable_autoscaling  = false
 }

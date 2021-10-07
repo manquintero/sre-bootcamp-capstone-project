@@ -28,9 +28,9 @@ module "vpc" {
   name             = "${local.name}-vpc"
   cidr             = "10.0.0.0/24"
   azs              = [data.aws_availability_zones.available.names[0], data.aws_availability_zones.available.names[1]]
-  public_subnets   = ["10.0.0.0/27", "10.0.0.32/27"]
-  private_subnets  = ["10.0.0.64/27", "10.0.0.96/27"]
-  database_subnets = ["10.0.0.128/27", "10.0.0.160/27"]
+  public_subnets   = ["10.0.0.0/26", "10.0.0.64/26"]
+  private_subnets  = ["10.0.0.128/27", "10.0.0.160/27"]
+  database_subnets = ["10.0.0.192/27", "10.0.0.224/27"]
 
   # Public access to RDS instances
   create_database_subnet_group           = true
@@ -65,7 +65,7 @@ module "app" {
   ecs_container_memory = 128
   ecs_container_cpu    = 50
   # Auto Scaling Group
-  asg_vpc_zone_identifier = module.vpc.public_subnets
+  asg_vpc_zone_identifier = module.vpc.private_subnets
   asg_min_size            = 2
   asg_max_size            = 2
   asg_instance_type       = "t2.micro"

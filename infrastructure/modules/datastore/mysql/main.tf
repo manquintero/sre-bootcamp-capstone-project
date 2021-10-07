@@ -4,6 +4,10 @@ locals {
   all_ips      = ["0.0.0.0/0"]
 }
 
+data "aws_secretsmanager_secret_version" "db_password" {
+  secret_id = var.db_password_secret_id
+}
+
 resource "aws_security_group" "rds_sg" {
   name        = "rds_sg"
   description = "Relational Database Service Security Group"
@@ -48,9 +52,8 @@ resource "aws_db_instance" "mysql" {
   final_snapshot_identifier = var.final_snapshot_identifier
   publicly_accessible       = var.publicly_accessible
 
-  # If you chose to use password manager:
-  #   password = data.aws_secretsmanager_secret_version.db_password.secret_string
-  password = var.db_password
+  # Retrieve from secret manager
+  password = data.aws_secretsmanager_secret_version.db_password.secret_string
 
   tags = {
     Environment = var.environment
