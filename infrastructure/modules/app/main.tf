@@ -121,3 +121,7 @@ module "asg" {
   health_check_type   = local.ec2_health_check_type
   enable_autoscaling  = false
 }
+
+module "lambda" {
+  source = "../lambda/test"
+}

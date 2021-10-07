@@ -5,3 +5,4 @@ Examples taken from:
 * [https://github.com/techservicesillinois/terraform-aws-ecs-service]
 * [https://www.sufle.io/blog/keeping-secrets-as-secret-on-amazon-ecs-using-terraform]
 * [https://github.com/umotif-public/terraform-aws-ecs-fargate-task-definition]
+* [https://www.amido.com/blog/terraform-does-not-need-your-code-to-provision-a-lambda-function]
