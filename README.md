@@ -57,3 +57,6 @@ TOKEN="eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoidmlld2VyIn0._k6kmfmdOoKW
 curl -s -H 'Accept: application/json' -H "Authorization: Bearer ${TOKEN}" localhost:8000/mask-to-cidr?value=255.128.0.0
 {"function":"maskToCidr","input":"255.128.0.0","output":"9"}
 ```
+
+# Architecture
+[Deliverable2](https://sre-bootcamp-capstone-project-static.s3.us-east-2.amazonaws.com/sre-bootcamp-deliverable2.png)
