@@ -59,4 +59,4 @@ curl -s -H 'Accept: application/json' -H "Authorization: Bearer ${TOKEN}" localh
 ```
 
 # Architecture
-[Deliverable2](https://sre-bootcamp-capstone-project-static.s3.us-east-2.amazonaws.com/sre-bootcamp-deliverable2.png)
+![Deliverable2](https://sre-bootcamp-capstone-project-static.s3.us-east-2.amazonaws.com/sre-bootcamp-deliverable2.png)
