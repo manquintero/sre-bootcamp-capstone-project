@@ -87,7 +87,11 @@ data "template_file" "task_definition_template" {
 }
 
 resource "aws_ecs_cluster" "ecs_cluster" {
-  name = "${var.app_name}-cluster"
+  name = "${var.app_name}-cluster-${var.environment}"
+
+  tags = {
+    Environment = var.environment
+  }
 }
 
 resource "aws_ecs_task_definition" "task_definition" {
@@ -107,6 +111,11 @@ resource "aws_ecs_service" "app" {
   cluster         = aws_ecs_cluster.ecs_cluster.id
   task_definition = aws_ecs_task_definition.task_definition.arn
   desired_count   = var.desired_count
+
+  deployment_circuit_breaker {
+    enable   = true
+    rollback = true
+  }
 
   load_balancer {
     target_group_arn = var.aws_lb_target_group_arn
