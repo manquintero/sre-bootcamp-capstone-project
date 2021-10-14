@@ -2,33 +2,51 @@ services:
   flask:
     build:
       context: ./python
+      dockerfile: Dockerfile
+      args:
+        COMMIT_SHA: "${COMMIT_SHA:-HEAD}"
     depends_on:
       mysql:
         condition: service_started
     environment:
       DB_HOST: mysql
-      DB_PASS: ThscAueWqKMU
-      DB_USERNAME: secret
-      JWT_TOKEN: my2w7wjd7yXF64FIADfJxNs1oupTGAuW
+      DB_PASS: "${DB_PASS}"
+      DB_USERNAME: "${DB_USERNAME}"
+      JWT_TOKEN: "${JWT_TOKEN}"
     image: manquintero/academy-sre-bootcamp-manuel-quintero:latest
+    networks:
+      default: null
     ports:
-    - published: 8000
-      target: 8000
+    - target: 8000
+      published: 8000
     volumes:
-    - ./python:/app:rw
+    - type: bind
+      source: ./python
+      target: /app
+      bind:
+        create_host_path: true
   mysql:
     build:
       context: ./mysql
+      dockerfile: Dockerfile
     environment:
-      MYSQL_DATABASE: bootcamp_tht
-      MYSQL_PASSWORD: ThscAueWqKMU
-      MYSQL_ROOT_PASSWORD: ThscAueWqKMU
-      MYSQL_USER: secret
+      MYSQL_DATABASE: "${MYSQL_DATABASE}"
+      MYSQL_PASSWORD: "${MYSQL_PASSWORD}"
+      MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
+      MYSQL_USER: "${MYSQL_USER}"
+    networks:
+      default: null
     ports:
-    - published: 3306
-      target: 3306
+    - target: 3306
+      published: 3306
     volumes:
-    - mysql_data:/var/lib/mysql:rw
-version: '3.9'
+    - type: volume
+      source: mysql_data
+      target: /var/lib/mysql
+      volume: {}
+networks:
+  default:
+    name: sre-bootcamp-capstone-project_default
 volumes:
-  mysql_data: {}
+  mysql_data:
+    name: sre-bootcamp-capstone-project_mysql_data
