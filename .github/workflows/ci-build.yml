@@ -134,3 +134,18 @@ jobs:
         run: |
           # Push docker image to ECR so that it can be deployed to ECS.
           docker push ${{ steps.login-ecr.outputs.registry }}/${{ env.IMAGE }}:${{ ENV.IMAGE_TAG }}
+
+  Terraform:
+    needs: ContainerRegistry
+    runs-on: ubuntu-latest
+    environment: production
+
+    # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      # Checkout the repository to the GitHub Actions runner
+      - name: Checkout
+        uses: actions/checkout@v2
