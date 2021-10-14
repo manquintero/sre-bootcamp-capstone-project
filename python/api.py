@@ -4,6 +4,7 @@ from http.client import UNAUTHORIZED, FORBIDDEN
 
 from flask import Flask, jsonify, abort, request
 
+from app_version import get_app_version
 from convert import mask_to_cidr, cidr_to_mask
 from methods import Token, Restricted
 
@@ -17,6 +18,13 @@ protected = Restricted()
 def url_root():
     """ Homepage """
     return "OK"
+
+
+# Retrieves the container and app version
+@app.route("/version")
+def url_version():
+    """ Exposes the application version """
+    return get_app_version()
 
 
 # Just a health check
