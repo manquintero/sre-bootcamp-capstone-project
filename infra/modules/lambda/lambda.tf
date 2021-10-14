@@ -1,5 +1,6 @@
 locals {
   payload_name = "lambda_function_payload"
+  python_runtime = "python3.8"
 }
 
 resource "aws_iam_role" "iam_for_lambda" {
@@ -22,12 +23,6 @@ resource "aws_iam_role" "iam_for_lambda" {
 EOF
 }
 
-data "archive_file" "lambda_handler_basic" {
-  type        = "zip"
-  source_dir  = "${path.module}/lambda_handler_basic"
-  output_path = "${path.module}/${local.payload_name}.zip"
-}
-
 resource "aws_lambda_function" "cidr_to_mask" {
   filename      = "${path.module}/${local.payload_name}.zip"
   function_name = "cidr_to_mask"
@@ -39,7 +34,7 @@ resource "aws_lambda_function" "cidr_to_mask" {
   # source_code_hash = "${base64sha256(file("${local.payload_name}.zip"))}"
   source_code_hash = filebase64sha256("${path.module}/${local.payload_name}.zip")
 
-  runtime = "python3.8"
+  runtime = local.python_runtime
 }
 
 resource "aws_lambda_function" "mask_to_cidr" {
@@ -53,12 +48,10 @@ resource "aws_lambda_function" "mask_to_cidr" {
   # source_code_hash = "${base64sha256(file("${local.payload_name}.zip"))}"
   source_code_hash = filebase64sha256("${path.module}/${local.payload_name}.zip")
 
-  runtime = "python3.8"
+  runtime = local.python_runtime
 }
 
 resource "aws_iam_role_policy_attachment" "lambda_policy" {
   role       = aws_iam_role.iam_for_lambda.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
-
-# 

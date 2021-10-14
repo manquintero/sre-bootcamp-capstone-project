@@ -123,5 +123,5 @@ module "asg" {
 }
 
 module "lambda" {
-  source = "../lambda/test"
+  source = "../lambda"
 }
