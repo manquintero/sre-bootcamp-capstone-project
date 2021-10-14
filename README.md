@@ -7,8 +7,7 @@ If you have any questions, feel free to contact your mentor or one of us: Juan B
 ## Status 
 | Metric | devel                                                                                                                       | main                                                                                                          |
 |--------|-----------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------|
-| CI     | ![ devel](https://github.com/manquintero/sre-bootcamp-capstone-project/actions/workflows/ci-build.yml/badge.svg?branch=devel) | ![ main](https://github.com/manquintero/sre-bootcamp-capstone-project/actions/workflows/ci-build.yml/badge.svg) |
-| Infra  | ![ devel](https://github.com/manquintero/sre-bootcamp-capstone-project/actions/workflows/terraform.yml/badge.svg?branch=devel) | ![ main](https://github.com/manquintero/sre-bootcamp-capstone-project/actions/workflows/terraform.yml/badge.svg) |
+| CI/CD  | ![ devel](https://github.com/manquintero/sre-bootcamp-capstone-project/actions/workflows/ci-build.yml/badge.svg?branch=devel) | ![ main](https://github.com/manquintero/sre-bootcamp-capstone-project/actions/workflows/ci-build.yml/badge.svg) |
 
 ### Implemented features
 - CI workflow

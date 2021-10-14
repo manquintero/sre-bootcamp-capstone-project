@@ -76,6 +76,7 @@ data "template_file" "task_definition_template" {
   vars = {
     "container_name"  = var.container_name
     "container_image" = var.container_image
+    "container_tag"   = var.container_tag
     "container_port"  = var.container_port
     "host_port"       = var.host_port
     "db_host"         = var.db_host
@@ -107,10 +108,11 @@ resource "aws_ecs_task_definition" "task_definition" {
 }
 
 resource "aws_ecs_service" "app" {
-  name            = var.app_name
-  cluster         = aws_ecs_cluster.ecs_cluster.id
-  task_definition = aws_ecs_task_definition.task_definition.arn
-  desired_count   = var.desired_count
+  name                 = var.app_name
+  cluster              = aws_ecs_cluster.ecs_cluster.id
+  task_definition      = aws_ecs_task_definition.task_definition.arn
+  desired_count        = var.desired_count
+  force_new_deployment = var.force_new_deployment
 
   deployment_circuit_breaker {
     enable   = true
@@ -121,5 +123,9 @@ resource "aws_ecs_service" "app" {
     target_group_arn = var.aws_lb_target_group_arn
     container_name   = var.container_name
     container_port   = var.container_port
+  }
+
+  tags = {
+    Environment = var.environment
   }
 }
