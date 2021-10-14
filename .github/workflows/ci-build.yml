@@ -134,3 +134,9 @@ jobs:
         run: |
           # Push docker image to ECR so that it can be deployed to ECS.
           docker push ${{ steps.login-ecr.outputs.registry }}/${{ env.IMAGE }}:${{ ENV.IMAGE_TAG }}
+
+  terraform:
+    name: 'Terraform'
+    needs: ContainerRegistry
+    runs-on: ubuntu-latest
+    environment: production
