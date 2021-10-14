@@ -17,6 +17,10 @@ jobs:
     runs-on: ubuntu-latest
     environment: production
 
+    strategy:
+      matrix:
+        environment: [development]
+
     # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
     defaults:
       run:
@@ -39,7 +43,7 @@ jobs:
       # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
       - name: Terraform Init
         run: |
-          terraform -chdir=infra/development/services/app init -input=false
+          terraform -chdir=infra/${{ matrix.environment }}/services/app init -input=false
 
       # # Generates an execution plan for Terraform
       # - name: Terraform Plan
