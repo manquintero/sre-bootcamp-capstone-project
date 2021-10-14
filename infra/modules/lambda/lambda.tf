@@ -40,6 +40,11 @@ resource "aws_lambda_function" "cidr_to_mask" {
   source_code_hash = filebase64sha256("${path.module}/${local.payload_name}.zip")
 
   runtime = "python3.8"
+
+  # We're mocking this resource for the sake of testing the resource generation.
+  depends_on = [
+    data.archive_file.lambda_handler_basic,
+  ]
 }
 
 resource "aws_lambda_function" "mask_to_cidr" {
@@ -54,6 +59,11 @@ resource "aws_lambda_function" "mask_to_cidr" {
   source_code_hash = filebase64sha256("${path.module}/${local.payload_name}.zip")
 
   runtime = "python3.8"
+
+  # We're mocking this resource for the sake of testing the resource generation.
+  depends_on = [
+    data.archive_file.lambda_handler_basic,
+  ]
 }
 
 resource "aws_iam_role_policy_attachment" "lambda_policy" {
