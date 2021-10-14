@@ -1,5 +1,5 @@
 locals {
-  payload_name = "lambda_function_payload"
+  payload_name   = "lambda_function_payload"
   python_runtime = "python3.8"
 }
 

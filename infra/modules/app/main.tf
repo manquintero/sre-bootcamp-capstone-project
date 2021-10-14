@@ -86,6 +86,7 @@ module "datastore" {
 module "ecs" {
   source = "../cluster/ecs"
   # Cluster
+  environment      = var.environment
   app_name         = local.app_name
   container_port   = local.container_port
   container_name   = local.container_name
