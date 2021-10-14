@@ -45,9 +45,10 @@ jobs:
         run: |
           terraform -chdir=infra/${{ matrix.environment }}/services/app init -input=false
 
-      # # Generates an execution plan for Terraform
-      # - name: Terraform Plan
-      #   run: terraform plan
+      # Generates an execution plan for Terraform
+      - name: Terraform Plan
+        run: |
+          terraform -chdir=infra/${{ matrix.environment }}/services/app plan
 
       # # On push to main, build or change infrastructure according to Terraform configuration files
       # - name: Terraform Apply
