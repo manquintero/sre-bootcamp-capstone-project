@@ -1,7 +1,7 @@
 [
   {
     "name": "${container_name}",
-    "image": "${container_image}",
+    "image": "${container_image}:${container_tag}",
     "portMappings": [
       {
         "containerPort": ${container_port},

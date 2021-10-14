@@ -23,6 +23,12 @@ variable "container_image" {
   type        = string
 }
 
+variable "container_tag" {
+  description = "Hash for the container image"
+  type        = string
+  default     = "latest"
+}
+
 variable "container_port" {
   description = "The port number on the container that is bound to the user-specified or automatically assigned host port"
   type        = number
@@ -44,10 +50,15 @@ variable "host_port" {
 }
 
 variable "desired_count" {
-  description = "Number of instances of the task definition to place and keep running"
+  description = "Number of instances of the task definition to place and keep running."
   type        = number
 }
 
+variable "force_new_deployment" {
+  description = "Enable to force a new task deployment of the service."
+  type        = bool
+  default     = true
+}
 variable "db_host" {
   description = "The hostname of the RDS instance"
   sensitive   = true
