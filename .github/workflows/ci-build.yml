@@ -93,8 +93,7 @@ jobs:
         run: |-
           docker build \
             --tag "gcr.io/${PROJECT_ID}/${{ env.IMAGE }}:${{ ENV.IMAGE_TAG }}" \
-            --build-arg GITHUB_SHA="latest" \
-            --build-arg GITHUB_REF="$GITHUB_REF" \
+            --build-arg COMMIT_SHA="$GITHUB_SHA" \
             ./python
       - name: Publish
         if: ${{ github.event_name == 'pull_request' }}
@@ -125,26 +124,13 @@ jobs:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         run: |
           # Build a docker container
-          docker build -t ${ECR_REGISTRY}/${{ env.IMAGE }}:${{ ENV.IMAGE_TAG }} ./python
+          docker build \
+            -t ${ECR_REGISTRY}/${{ env.IMAGE }}:${{ ENV.IMAGE_TAG }} \
+            --build-arg COMMIT_SHA="$GITHUB_SHA" \
+            ./python
           echo "::set-output name=image::${ECR_REGISTRY}/${{ env.IMAGE }}:${{ ENV.IMAGE_TAG }}"
       - name: Publish to Amazon ECR
         if: ${{ github.event_name == 'pull_request' }}
         run: |
           # Push docker image to ECR so that it can be deployed to ECS.
           docker push ${{ steps.login-ecr.outputs.registry }}/${{ env.IMAGE }}:${{ ENV.IMAGE_TAG }}
-
-      # - name: Fill in the new image ID in the Amazon ECS task definition
-      #   id: task-def
-      #   uses: aws-actions/amazon-ecs-render-task-definition@v1
-      #   with:
-      #     task-definition: ${{ env.ECS_TASK_DEFINITION }}
-      #     container-name: ${{ env.CONTAINER_NAME }}
-      #     image: ${{ steps.build-image.outputs.image }}
-
-      # - name: Deploy Amazon ECS task definition
-      #   uses: aws-actions/amazon-ecs-deploy-task-definition@v1
-      #   with:
-      #     task-definition: ${{ steps.task-def.outputs.task-definition }}
-      #     service: ${{ env.ECS_SERVICE }}
-      #     cluster: ${{ env.ECS_CLUSTER }}
-      #     wait-for-service-stability: true
