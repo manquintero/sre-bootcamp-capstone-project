@@ -1,6 +1,9 @@
 # Instructions from: https://docs.docker.com/language/python/build-images/
 FROM python:3-slim
 
+# Build arguments
+ARG COMMIT_SHA="unknown"
+
 # Set the working directory
 WORKDIR /app
 
@@ -14,6 +17,7 @@ COPY . .
 # Set environment variables
 ENV FLASK_APP=api.py
 ENV FLASK_RUN_PORT=8000
+ENV COMMIT_SHA="${COMMIT_SHA}"
 
 # Expose the application's port
 EXPOSE 8000
