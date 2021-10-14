@@ -171,3 +171,8 @@ jobs:
       - name: Terraform Init
         run: |
           terraform -chdir=infra/${{ matrix.environment }}/services/app init -input=false
+
+      # Generates an execution plan for Terraform
+      - name: Terraform Plan
+        run: |
+          terraform -chdir=infra/${{ matrix.environment }}/services/app plan
