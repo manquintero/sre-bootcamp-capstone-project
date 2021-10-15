@@ -1,18 +1,22 @@
 name: CI
+
 'on':
   push:
     branches:
-      - devel
+      - main
+      - development
   pull_request:
     branches:
       - main
+
 env:
   PROJECT_ID: ${{ secrets.GKE_PROJECT }}
   IMAGE: academy-sre-bootcamp-manuel-quintero
   IMAGE_TAG: "latest"
   ECS_TASK_DEFINITION: ".aws/task-definition.json"
+
 jobs:
-  build:
+  Build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -31,8 +35,9 @@ jobs:
       - name: Analysing the code with pylint
         run: |
           pylint python/
-  tests:
-    needs: build
+
+  Test:
+    needs: Build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -53,8 +58,9 @@ jobs:
           pytest --cov-config=python/.coveragerc --cov python > pytest-coverage.txt
       - name: Comment coverage
         uses: coroo/pytest-coverage-commentator@v1.0.2
+
   DockerHub:
-    needs: tests
+    needs: Test
     runs-on: ubuntu-latest
     environment: development
     steps:
@@ -76,8 +82,9 @@ jobs:
           tags: ${{ secrets.DOCKER_HUB_USERNAME }}/${{ env.IMAGE }}:${{ ENV.IMAGE_TAG }}
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
+
   ContainerRegistry:
-    needs: tests
+    needs: Test
     runs-on: ubuntu-latest
     environment: development
     steps:
@@ -99,8 +106,9 @@ jobs:
         if: ${{ github.event_name == 'pull_request' }}
         run: |-
           docker push "gcr.io/${PROJECT_ID}/${{ env.IMAGE }}:${{ ENV.IMAGE_TAG }}"
+
   ECR:
-    needs: tests
+    needs: Test
     runs-on: ubuntu-latest
     environment: development
     steps:
