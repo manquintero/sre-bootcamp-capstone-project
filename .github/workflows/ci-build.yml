@@ -100,14 +100,14 @@ jobs:
         run: |-
           docker build \
             --tag "gcr.io/${PROJECT_ID}/${{ env.IMAGE }}:${{ ENV.IMAGE_TAG }}" \
-            --build-arg COMMIT_SHA="$GITHUB_SHA" \
+            --build-arg COMMIT_SHA=${{ github.sha }} \
             ./python
       - name: Publish
         if: ${{ github.event_name == 'pull_request' }}
         run: |-
           docker push "gcr.io/${PROJECT_ID}/${{ env.IMAGE }}:${{ ENV.IMAGE_TAG }}"
 
-  ECR:
+  ElasticContainerRegistry:
     needs: Test
     runs-on: ubuntu-latest
     environment: development
@@ -134,7 +134,7 @@ jobs:
           # Build a docker container
           docker build \
             -t ${ECR_REGISTRY}/${{ env.IMAGE }}:${{ ENV.IMAGE_TAG }} \
-            --build-arg COMMIT_SHA="$GITHUB_SHA" \
+            --build-arg COMMIT_SHA=${{ github.sha }} \
             ./python
           echo "::set-output name=image::${ECR_REGISTRY}/${{ env.IMAGE }}:${{ ENV.IMAGE_TAG }}"
       - name: Publish to Amazon ECR
@@ -144,7 +144,7 @@ jobs:
           docker push ${{ steps.login-ecr.outputs.registry }}/${{ env.IMAGE }}:${{ ENV.IMAGE_TAG }}
 
   Terraform:
-    needs: ContainerRegistry
+    needs: ElasticContainerRegistry
     runs-on: ubuntu-latest
     environment: production
 
