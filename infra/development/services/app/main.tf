@@ -63,7 +63,7 @@ module "app" {
   # Elastic Container Service
   ecs_desired_count    = 2
   ecs_container_memory = 128
-  ecs_container_cpu    = 50
+  ecs_container_cpu    = 10
   # Auto Scaling Group
   asg_vpc_zone_identifier = module.vpc.private_subnets
   asg_min_size            = 2

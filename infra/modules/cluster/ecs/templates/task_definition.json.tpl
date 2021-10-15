@@ -16,6 +16,9 @@
       {"name": "DB_PASS", "valueFrom": "${db_password_arn}"}
     ],
     "memory": ${memory},
-    "cpu": ${cpu}
+    "cpu": ${cpu},
+    "tags": [
+      {"key": "ENVIRONMENT", "value": "${environment}"}
+    ]
   }
 ]
