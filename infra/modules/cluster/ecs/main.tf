@@ -84,6 +84,7 @@ data "template_file" "task_definition_template" {
     "db_password_arn" = var.db_password_arn
     "memory"          = var.container_memory
     "cpu"             = var.container_cpu
+    "environment"     = var.environment
   }
 }
 
