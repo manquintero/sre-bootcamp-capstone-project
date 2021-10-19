@@ -15,3 +15,9 @@ output "mysql_endpoint" {
   value       = module.app.mysql_endpoint
   description = "The URL of the RDS instance"
 }
+
+# Bastion
+output "bastion_public_ip" {
+  value       = module.app.bastion_public_ip
+  description = "Management Node"
+}

@@ -33,6 +33,16 @@ variable "alb_security_group_id" {
   type        = string
 }
 
+variable "bastion_security_group_id" {
+  description = "Security group id to allow access to/from"
+  type        = string
+}
+
+variable "key_name" {
+  description = "The key name that should be used for the instance."
+  type        = string
+}
+
 variable "min_size" {
   description = "The minimum number of EC2 Instances in the ASG"
   type        = number

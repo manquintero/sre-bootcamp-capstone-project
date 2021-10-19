@@ -19,6 +19,15 @@ module "alb" {
   environment = var.environment
 }
 
+module "bastion" {
+  source = "../networking/bastion"
+
+  vpc_id            = var.vpc_id
+  subnet_id         = var.bastion_subnet_id
+  internal_networks = var.bastion_internal_networks
+  environment       = var.environment
+}
+
 resource "aws_lb_target_group" "lbtg" {
   name     = "${var.project}-lbtg"
   port     = local.host_port
@@ -107,8 +116,10 @@ module "asg" {
   source = "../cluster/asg"
 
   # Module config
-  vpc_id                = var.vpc_id
-  alb_security_group_id = module.alb.alb_security_group_id
+  vpc_id                    = var.vpc_id
+  alb_security_group_id     = module.alb.security_group_id
+  bastion_security_group_id = module.bastion.security_group_id
+  key_name                  = module.bastion.key_name
   # Launch configuration
   instance_type        = var.asg_instance_type
   cluster_name         = module.ecs.cluster_name
