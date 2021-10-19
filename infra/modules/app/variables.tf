@@ -18,6 +18,16 @@ variable "alb_subnet_ids" {
   type        = list(string)
 }
 
+variable "bastion_subnet_id" {
+  description = "VPC Subnet ID to launch in."
+  type        = string
+}
+
+variable "bastion_internal_networks" {
+  type        = list(string)
+  description = "Internal network CIDR blocks."
+}
+
 variable "ecs_desired_count" {
   description = "Number of instances of the task definition to place and keep running"
   type        = number

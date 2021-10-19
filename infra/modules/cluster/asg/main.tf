@@ -1,6 +1,7 @@
 locals {
   any_port     = 0
   https_port   = 443
+  ssh_port     = 22
   tcp_protocol = "tcp"
   any_protocol = "-1"
   all_ips      = ["0.0.0.0/0"]
@@ -75,7 +76,7 @@ resource "aws_security_group_rule" "service_in_lb" {
 }
 
 # Allow all outbound traffic from the containers. This is necessary
-# to support pulling Docker images from Dockerhub and ECR. 
+# to support pulling Docker images from Dockerhub and ECR.
 resource "aws_security_group_rule" "service_out" {
   description = "Allow outbound connections for all protocols and all ports for ECS service"
   type        = "egress"
@@ -84,6 +85,19 @@ resource "aws_security_group_rule" "service_out" {
   to_port     = local.any_port
   protocol    = local.any_protocol
   cidr_blocks = local.all_ips
+
+  security_group_id = aws_security_group.ecs_sg.id
+}
+
+# Allow inbound SSH connections from the internal networks
+resource "aws_security_group_rule" "ssh_in" {
+  description = "Allow inbound connections for SSH protocol from the internal network"
+  type        = "ingress"
+
+  from_port                = local.ssh_port
+  to_port                  = local.ssh_port
+  protocol                 = local.tcp_protocol
+  source_security_group_id = var.bastion_security_group_id
 
   security_group_id = aws_security_group.ecs_sg.id
 }
@@ -107,6 +121,7 @@ resource "aws_launch_configuration" "ecs_launch_config" {
   name_prefix                 = "${var.launch_config_prefix}-"
   image_id                    = data.aws_ami.amazon_linux_ecs.id
   instance_type               = var.instance_type
+  key_name                    = var.key_name
   associate_public_ip_address = false
 
   iam_instance_profile = aws_iam_instance_profile.ecs_agent.name
