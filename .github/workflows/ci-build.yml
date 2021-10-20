@@ -183,10 +183,10 @@ jobs:
       # Generates an execution plan for Terraform
       - name: Terraform Plan
         run: |
-          terraform -chdir=infra/${{ matrix.environment }}/services/app plan -var "container_tag=latest"
+          terraform -chdir=infra/${{ matrix.environment }}/services/app plan -var "container_tag=${{ ENV.IMAGE_TAG }}"
 
       # On push to main, build or change infrastructure according to Terraform configuration files
       - name: Terraform Apply
         if: github.ref == 'refs/heads/main'
         run: |
-          terraform -chdir=infra/${{ matrix.environment }}/services/app apply -var "container_tag=latest" -auto-approve
+          terraform -chdir=infra/${{ matrix.environment }}/services/app apply -var "container_tag=${{ ENV.IMAGE_TAG }}" -auto-approve
