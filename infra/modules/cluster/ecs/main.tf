@@ -113,7 +113,6 @@ resource "aws_ecs_service" "app" {
   cluster              = aws_ecs_cluster.ecs_cluster.id
   task_definition      = aws_ecs_task_definition.task_definition.arn
   desired_count        = var.desired_count
-  force_new_deployment = var.force_new_deployment
 
   deployment_circuit_breaker {
     enable   = true
