@@ -43,6 +43,11 @@ variable "ecs_container_cpu" {
   type    = number
 }
 
+variable "ecs_container_tag" {
+  description = "Hash for the container image"
+  type        = string
+}
+
 variable "asg_vpc_zone_identifier" {
   description = "A list of subnet IDs to launch resources in."
   type        = list(string)
