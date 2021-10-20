@@ -12,8 +12,7 @@ name: CI
 env:
   PROJECT_ID: ${{ secrets.GKE_PROJECT }}
   IMAGE: academy-sre-bootcamp-manuel-quintero
-  IMAGE_TAG: "latest"
-  ECS_TASK_DEFINITION: ".aws/task-definition.json"
+  IMAGE_TAG: ${{ github.sha }}
 
 jobs:
   Build:
@@ -147,6 +146,7 @@ jobs:
     needs: ElasticContainerRegistry
     runs-on: ubuntu-latest
     environment: production
+    if: github.event_name == 'push'
 
     env:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -187,6 +187,6 @@ jobs:
 
       # On push to main, build or change infrastructure according to Terraform configuration files
       - name: Terraform Apply
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        if: github.ref == 'refs/heads/main'
         run: |
           terraform -chdir=infra/${{ matrix.environment }}/services/app apply -auto-approve
