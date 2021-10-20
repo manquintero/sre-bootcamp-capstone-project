@@ -26,7 +26,6 @@ variable "container_image" {
 variable "container_tag" {
   description = "Hash for the container image"
   type        = string
-  default     = "latest"
 }
 
 variable "container_port" {

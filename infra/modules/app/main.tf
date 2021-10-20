@@ -102,6 +102,7 @@ module "ecs" {
   container_image  = module.ecr.repository_url
   container_memory = var.ecs_container_memory
   container_cpu    = var.ecs_container_cpu
+  container_tag    = var.ecs_container_tag
   db_host          = module.datastore.address
   db_username      = local.db_username
   host_port        = local.host_port
