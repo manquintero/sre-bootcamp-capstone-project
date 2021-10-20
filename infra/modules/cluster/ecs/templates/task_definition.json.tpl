@@ -11,7 +11,7 @@
     "environment": [
       {"name": "DB_HOST", "value": "${db_host}"},
       {"name": "DB_USERNAME", "value": "${db_username}"},
-      {"name": "COMMIT_SHA", "value": "${container_tag}"}
+      {"name": "COMMIT_SHA", "value": "${container_tag} (${environment})"}
     ],
     "secrets": [
       {"name": "DB_PASS", "valueFrom": "${db_password_arn}"}
