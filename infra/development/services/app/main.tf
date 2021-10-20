@@ -58,10 +58,10 @@ module "app" {
   environment = local.environment
 
   # Networking
-  vpc_id                    = module.vpc.vpc_id
-  alb_subnet_ids            = module.vpc.public_subnets
-  bastion_subnet_id         = module.vpc.public_subnets[0] # Allocate the bastion in the first public IP
-  bastion_internal_networks = module.vpc.private_subnets_cidr_blocks
+  vpc_id                      = module.vpc.vpc_id
+  alb_subnet_ids              = module.vpc.public_subnets
+  bastion_internal_networks   = module.vpc.private_subnets_cidr_blocks
+  bastion_vpc_zone_identifier = module.vpc.public_subnets
   # Elastic Container Service
   ecs_desired_count    = 2
   ecs_container_memory = 128

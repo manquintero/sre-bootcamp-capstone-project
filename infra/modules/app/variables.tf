@@ -18,14 +18,14 @@ variable "alb_subnet_ids" {
   type        = list(string)
 }
 
-variable "bastion_subnet_id" {
-  description = "VPC Subnet ID to launch in."
-  type        = string
+variable "bastion_internal_networks" {
+  description = "Internal network CIDR blocks."
+  type        = list(string)
 }
 
-variable "bastion_internal_networks" {
+variable "bastion_vpc_zone_identifier" {
+  description = "A list of one or more availability zones for the group"
   type        = list(string)
-  description = "Internal network CIDR blocks."
 }
 
 variable "ecs_desired_count" {
