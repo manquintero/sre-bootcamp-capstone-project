@@ -17,7 +17,6 @@ COPY . .
 # Set environment variables
 ENV FLASK_APP=api.py
 ENV FLASK_RUN_PORT=8000
-ENV COMMIT_SHA="${COMMIT_SHA}"
 
 # Expose the application's port
 EXPOSE 8000
