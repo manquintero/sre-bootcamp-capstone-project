@@ -180,6 +180,7 @@ jobs:
 
       # Generates an execution plan for Terraform
       - name: Terraform Plan
+        if: github.event_name == 'push'
         run: |
           terraform -chdir=infra/${{ matrix.environment }}/services/app plan -var "container_tag=${{ ENV.IMAGE_TAG }}"
 
