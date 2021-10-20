@@ -61,19 +61,52 @@ data "aws_ami" "amazon_linux_ecs" {
   }
 }
 
-resource "aws_instance" "bastion" {
-  ami                         = data.aws_ami.amazon_linux_ecs.id
+resource "aws_launch_configuration" "bastions_lc" {
+  name_prefix                 = "bastions-"
+  image_id                    = data.aws_ami.amazon_linux_ecs.id
   instance_type               = "t2.micro"
-  subnet_id                   = var.subnet_id
   key_name                    = aws_key_pair.bastion_key.key_name
   associate_public_ip_address = true
 
   # Security
   security_groups = [aws_security_group.bastion_sg.id]
 
-  tags = {
-    Name        = "Bastion ${var.environment}"
-    Environment = var.environment
+  # Required when using a launch configuration with an auto scaling group.
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "aws_autoscaling_group" "bastions_asg" {
+  # Explicitly depend on the launch configuration's name so each time it's replaced this ASG is also replaced
+  name                 = "bastions-${var.environment}-${aws_launch_configuration.bastions_lc.name}"
+  launch_configuration = aws_launch_configuration.bastions_lc.name
+
+  # Capacity and Allocation
+  vpc_zone_identifier = var.vpc_zone_identifier
+  desired_capacity    = length(var.vpc_zone_identifier)
+  max_size            = length(var.vpc_zone_identifier)
+  min_size            = length(var.vpc_zone_identifier)
+
+  # Wait for at least this many instances to pass health checks before considering the ASG deployment complete
+  min_elb_capacity = length(var.vpc_zone_identifier)
+
+  # Health
+  health_check_type = "EC2"
+
+  lifecycle {
+    create_before_destroy = true
   }
 
+  tag {
+    key                 = "Name"
+    value               = "bastion-${var.environment}"
+    propagate_at_launch = true
+  }
+
+  tag {
+    key                 = "Environment"
+    value               = var.environment
+    propagate_at_launch = true
+  }
 }

@@ -8,3 +8,4 @@ Examples taken from:
 * [https://www.amido.com/blog/terraform-does-not-need-your-code-to-provision-a-lambda-function]
 * [https://learn.hashicorp.com/tutorials/terraform/lambda-api-gateway]
 * [https://www.davidbegin.com/creating-an-aws-bastion-host-with-terraform/]
+* [https://aws-quickstart.github.io/quickstart-linux-bastion/]

@@ -22,10 +22,10 @@ module "alb" {
 module "bastion" {
   source = "../networking/bastion"
 
-  vpc_id            = var.vpc_id
-  subnet_id         = var.bastion_subnet_id
-  internal_networks = var.bastion_internal_networks
-  environment       = var.environment
+  vpc_id              = var.vpc_id
+  vpc_zone_identifier = var.bastion_vpc_zone_identifier
+  internal_networks   = var.bastion_internal_networks
+  environment         = var.environment
 }
 
 resource "aws_lb_target_group" "lbtg" {

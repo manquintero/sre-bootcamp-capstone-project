@@ -8,12 +8,12 @@ variable "environment" {
   type        = string
 }
 
-variable "subnet_id" {
-  description = "VPC Subnet ID to launch in."
-  type        = string
+variable "internal_networks" {
+  description = "Internal network CIDR blocks."
+  type        = list(string)
 }
 
-variable "internal_networks" {
+variable "vpc_zone_identifier" {
+  description = "A list of subnet IDs to launch resources in."
   type        = list(string)
-  description = "Internal network CIDR blocks."
 }
