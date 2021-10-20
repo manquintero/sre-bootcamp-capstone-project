@@ -109,7 +109,8 @@ resource "aws_ecs_task_definition" "task_definition" {
 }
 
 resource "aws_ecs_service" "app" {
-  name            = var.app_name
+  # Force a new service deployment for every task definition
+  name            = "${var.app_name}-${aws_ecs_task_definition.task_definition.revision}"
   cluster         = aws_ecs_cluster.ecs_cluster.id
   task_definition = aws_ecs_task_definition.task_definition.arn
   desired_count   = var.desired_count
@@ -123,6 +124,10 @@ resource "aws_ecs_service" "app" {
     target_group_arn = var.aws_lb_target_group_arn
     container_name   = var.container_name
     container_port   = var.container_port
+  }
+
+  lifecycle {
+    create_before_destroy = true
   }
 
   tags = {
