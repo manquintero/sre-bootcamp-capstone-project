@@ -53,11 +53,6 @@ variable "desired_count" {
   type        = number
 }
 
-variable "force_new_deployment" {
-  description = "Enable to force a new task deployment of the service."
-  type        = bool
-  default     = true
-}
 variable "db_host" {
   description = "The hostname of the RDS instance"
   sensitive   = true

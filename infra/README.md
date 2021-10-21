@@ -9,3 +9,4 @@ Examples taken from:
 * [https://learn.hashicorp.com/tutorials/terraform/lambda-api-gateway]
 * [https://www.davidbegin.com/creating-an-aws-bastion-host-with-terraform/]
 * [https://aws-quickstart.github.io/quickstart-linux-bastion/]
+* [https://techsparx.com/software-development/terraform/aws/rds/simple-deploy.html]

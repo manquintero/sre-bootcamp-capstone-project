@@ -11,9 +11,7 @@ output "ecr_repository_worker_endpoint" {
 }
 
 # Data Store
-output "mysql_endpoint" {
-  value       = module.datastore.endpoint
-  description = "The URL of the RDS instance"
+output "mysql_connection_parameters" {
+  value       = "mysql -u ${module.datastore.user} -h ${module.datastore.address} -p"
+  description = "mysql connection string"
 }
-
-# Bastion

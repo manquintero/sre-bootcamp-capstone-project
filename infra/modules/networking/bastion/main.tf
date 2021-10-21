@@ -43,30 +43,38 @@ resource "aws_security_group_rule" "intranet" {
   security_group_id = aws_security_group.bastion_sg.id
 }
 
+# Allow internet egress traffic to install tools
+resource "aws_security_group_rule" "internet" {
+  description = "Allow all traffic in the intranet"
+  type        = "egress"
+
+  from_port   = local.any_port
+  to_port     = local.any_port
+  protocol    = local.any_protocol
+  cidr_blocks = local.all_ips
+
+  security_group_id = aws_security_group.bastion_sg.id
+}
 
 # For now we only use the AWS ECS optimized ami
-data "aws_ami" "amazon_linux_ecs" {
+data "aws_ami" "ubuntu" {
   most_recent = true
+  owners      = ["099720109477"] # Canonical
+}
 
-  owners = ["amazon"]
-
-  filter {
-    name   = "name"
-    values = ["amzn-ami-*-amazon-ecs-optimized"]
-  }
-
-  filter {
-    name   = "owner-alias"
-    values = ["amazon"]
-  }
+data "template_file" "user_data" {
+  template = file("${path.module}/user-data.sh")
 }
 
 resource "aws_launch_configuration" "bastions_lc" {
   name_prefix                 = "bastions-"
-  image_id                    = data.aws_ami.amazon_linux_ecs.id
+  image_id                    = data.aws_ami.ubuntu.id
   instance_type               = "t2.micro"
   key_name                    = aws_key_pair.bastion_key.key_name
   associate_public_ip_address = true
+
+  # Install user programs
+  user_data = data.template_file.user_data.rendered
 
   # Security
   security_groups = [aws_security_group.bastion_sg.id]
@@ -79,14 +87,14 @@ resource "aws_launch_configuration" "bastions_lc" {
 
 resource "aws_autoscaling_group" "bastions_asg" {
   # Explicitly depend on the launch configuration's name so each time it's replaced this ASG is also replaced
-  name                 = "bastions-${var.environment}-${aws_launch_configuration.bastions_lc.name}"
+  name                 = "${aws_launch_configuration.bastions_lc.name}-${var.environment}-instance"
   launch_configuration = aws_launch_configuration.bastions_lc.name
 
   # Capacity and Allocation
   vpc_zone_identifier = var.vpc_zone_identifier
   desired_capacity    = length(var.vpc_zone_identifier)
   max_size            = length(var.vpc_zone_identifier)
-  min_size            = length(var.vpc_zone_identifier)
+  min_size            = 1
 
   # Wait for at least this many instances to pass health checks before considering the ASG deployment complete
   min_elb_capacity = length(var.vpc_zone_identifier)
