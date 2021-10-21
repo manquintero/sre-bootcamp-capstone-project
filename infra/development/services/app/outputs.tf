@@ -15,5 +15,3 @@ output "mysql_endpoint" {
   value       = module.app.mysql_endpoint
   description = "The URL of the RDS instance"
 }
-
-# Bastion

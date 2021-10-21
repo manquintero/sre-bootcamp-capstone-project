@@ -32,14 +32,6 @@ module "vpc" {
   private_subnets  = ["10.0.0.128/27", "10.0.0.160/27"]
   database_subnets = ["10.0.0.192/27", "10.0.0.224/27"]
 
-  # Public access to RDS instances
-  create_database_subnet_group           = true
-  create_database_subnet_route_table     = true
-  create_database_internet_gateway_route = true
-
-  enable_dns_hostnames = true
-  enable_dns_support   = true
-
   # One NAT Gateway per subnet (default behavior)
   enable_nat_gateway     = true
   single_nat_gateway     = false
@@ -60,7 +52,7 @@ module "app" {
   # Networking
   vpc_id                      = module.vpc.vpc_id
   alb_subnet_ids              = module.vpc.public_subnets
-  bastion_internal_networks   = module.vpc.private_subnets_cidr_blocks
+  bastion_internal_networks   = concat(module.vpc.private_subnets_cidr_blocks, module.vpc.database_subnets_cidr_blocks)
   bastion_vpc_zone_identifier = module.vpc.public_subnets
   # Elastic Container Service
   ecs_desired_count    = 2
