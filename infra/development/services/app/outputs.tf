@@ -11,7 +11,7 @@ output "ecr_repository_worker_endpoint" {
 }
 
 # RDS
-output "mysql_endpoint" {
-  value       = module.app.mysql_endpoint
-  description = "The URL of the RDS instance"
+output "mysql_connection_parameters" {
+  value       = module.app.mysql_connection_parameters
+  description = "mysql connection string"
 }
