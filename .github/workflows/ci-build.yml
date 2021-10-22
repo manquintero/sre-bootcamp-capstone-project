@@ -154,10 +154,10 @@ jobs:
         shell: bash
 
     steps:
-      # Checkout the repository to the GitHub Actions runner
-      - name: Checkout
-        uses: actions/checkout@v2
-        id: Variables
+      - uses: actions/checkout@v2
+
+      - name: Set output
+        id: vars
         run: echo ::set-output name=short_ref::${GITHUB_REF#refs/*/}
 
       # Install the latest version of Terraform CLI and configure the Terraform CLI configuration file with a Terraform Cloud user API token
