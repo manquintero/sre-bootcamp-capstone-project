@@ -96,9 +96,6 @@ resource "aws_autoscaling_group" "bastions_asg" {
   max_size            = length(var.vpc_zone_identifier)
   min_size            = 1
 
-  # Wait for at least this many instances to pass health checks before considering the ASG deployment complete
-  min_elb_capacity = length(var.vpc_zone_identifier)
-
   # Health
   health_check_type = "EC2"
 
