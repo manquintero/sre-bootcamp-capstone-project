@@ -10,6 +10,23 @@ locals {
   db_username = "secret"
 }
 
+# For now we only use the AWS ECS optimized ami <https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-optimized_AMI.html>
+data "aws_ami" "amazon_linux_ecs" {
+  most_recent = true
+
+  owners = ["amazon"]
+
+  filter {
+    name   = "name"
+    values = ["amzn-ami-*-amazon-ecs-optimized"]
+  }
+
+  filter {
+    name   = "owner-alias"
+    values = ["amazon"]
+  }
+}
+
 module "alb" {
   source = "../networking/alb"
 
@@ -26,6 +43,7 @@ module "bastion" {
   vpc_zone_identifier = var.bastion_vpc_zone_identifier
   internal_networks   = var.bastion_internal_networks
   environment         = var.environment
+  image_id            = data.aws_ami.amazon_linux_ecs.id
 }
 
 resource "aws_lb_target_group" "lbtg" {
@@ -126,6 +144,7 @@ module "asg" {
   cluster_name         = module.ecs.cluster_name
   host_port            = local.host_port
   launch_config_prefix = local.app_name
+  image_id             = data.aws_ami.amazon_linux_ecs.id
   # Auto-Scale
   vpc_zone_identifier = var.asg_vpc_zone_identifier
   target_group_arns   = [aws_lb_target_group.lbtg.arn]

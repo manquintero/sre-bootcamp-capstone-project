@@ -18,23 +18,6 @@ data "aws_iam_policy_document" "ecs_agent" {
   }
 }
 
-# For now we only use the AWS ECS optimized ami <https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-optimized_AMI.html>
-data "aws_ami" "amazon_linux_ecs" {
-  most_recent = true
-
-  owners = ["amazon"]
-
-  filter {
-    name   = "name"
-    values = ["amzn-ami-*-amazon-ecs-optimized"]
-  }
-
-  filter {
-    name   = "owner-alias"
-    values = ["amazon"]
-  }
-}
-
 data "template_file" "user_data" {
   template = file("${path.module}/templates/user-data.sh")
 
@@ -119,7 +102,7 @@ resource "aws_iam_role_policy_attachment" "ecs_agent" {
 
 resource "aws_launch_configuration" "ecs_launch_config" {
   name_prefix                 = "${var.launch_config_prefix}-"
-  image_id                    = data.aws_ami.amazon_linux_ecs.id
+  image_id                    = var.image_id
   instance_type               = var.instance_type
   key_name                    = var.key_name
   associate_public_ip_address = false

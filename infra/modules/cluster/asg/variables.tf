@@ -68,3 +68,8 @@ variable "enable_autoscaling" {
   description = "If set to true, enable auto scaling"
   type        = bool
 }
+
+variable "image_id" {
+  description = "The EC2 image ID to launch."
+  type        = string
+}

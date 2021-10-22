@@ -17,3 +17,8 @@ variable "vpc_zone_identifier" {
   description = "A list of subnet IDs to launch resources in."
   type        = list(string)
 }
+
+variable "image_id" {
+  description = "The EC2 image ID to launch."
+  type        = string
+}

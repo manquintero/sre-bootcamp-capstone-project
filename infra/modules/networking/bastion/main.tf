@@ -6,6 +6,10 @@ locals {
   all_ips      = ["0.0.0.0/0"]
 }
 
+data "template_file" "user_data" {
+  template = file("${path.module}/user-data.sh")
+}
+
 resource "aws_key_pair" "bastion_key" {
   key_name   = "bastion-key"
   public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQD3JYHWXKVZnSn10XqlGcHWE1WvLqctuKvXmBlkmgQ+kbRGNLQU9R9B958WH5ay0t0LDwNlZA4iWsKWBl3efcF0BCktETaK3MwkUB6JIOz9Yz4/RqPG36o4iN445UDNnoJbPCULLNhXLrWx9lwJov7UZNemV3+8NCoIya1iqQTYWxz/8cj8e4r/WJs2EvKayyt/MfBarYzZledhI7/MOPYODMhPGJcaItDOCq3jr1xmhPTNrWPJ/bHR/iz+aVkOpuwWy3PbpZF1P2uw+Orfy5qSWqhVLcUpKvTnd+AujCS4E0DPuIGKgrXrCVzX6flrK7RExbGdRzNoVC66/aKXxdyr3DYS4ZWbGHaEIfXatKLu67mgniiQyFRviNKNXxW1QMsl9YlmpYKPJ7SvLkvGt1lHqyw9aHZpjjEZstnSF9WOJkKudyiKrbgfe9MgyUWK/b4f0JseexkF4iI9v7bhNkZ/UWt6rlecPGWbv2CtWWSwwjKyvBVl3tDbP3BzGhVyspK2gMvjmD0qn8cNdtAGyxhh1tV4zOiOx9pT/v/lDOi08yGHRixljJK653iQC+iBp69IsSyVf2n/aOE4r0cOdH+aD4j5dD9gyWKpgGGI8BGBdIEqoV+gP1xUKvy4YUWZdS9SUHsZNWHwKdxxE+EZT+Mhc83s+U4w0cjxFKEjSgdYSQ== man.quintero@gmail.com"
@@ -56,19 +60,9 @@ resource "aws_security_group_rule" "internet" {
   security_group_id = aws_security_group.bastion_sg.id
 }
 
-# For now we only use the AWS ECS optimized ami
-data "aws_ami" "ubuntu" {
-  most_recent = true
-  owners      = ["099720109477"] # Canonical
-}
-
-data "template_file" "user_data" {
-  template = file("${path.module}/user-data.sh")
-}
-
 resource "aws_launch_configuration" "bastions_lc" {
   name_prefix                 = "bastions-"
-  image_id                    = data.aws_ami.ubuntu.id
+  image_id                    = var.image_id
   instance_type               = "t2.micro"
   key_name                    = aws_key_pair.bastion_key.key_name
   associate_public_ip_address = true
