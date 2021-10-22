@@ -99,10 +99,6 @@ resource "aws_autoscaling_group" "bastions_asg" {
   # Health
   health_check_type = "EC2"
 
-  lifecycle {
-    create_before_destroy = true
-  }
-
   tag {
     key                 = "Name"
     value               = "bastion-${var.environment}"
