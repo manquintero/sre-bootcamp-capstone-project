@@ -15,6 +15,7 @@ env:
   IMAGE_TAG: ${{ github.sha }}
 
 jobs:
+
   Build:
     runs-on: ubuntu-latest
     steps:
@@ -61,7 +62,6 @@ jobs:
   DockerHub:
     needs: Test
     runs-on: ubuntu-latest
-    environment: development
     steps:
       - uses: actions/checkout@v2
       - name: Login to Docker Hub
@@ -84,7 +84,6 @@ jobs:
   ContainerRegistry:
     needs: Test
     runs-on: ubuntu-latest
-    environment: development
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -108,7 +107,6 @@ jobs:
   ElasticContainerRegistry:
     needs: Test
     runs-on: ubuntu-latest
-    environment: development
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -150,19 +148,17 @@ jobs:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
-    strategy:
-      matrix:
-        environment: [development]
-
     # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
     defaults:
       run:
         shell: bash
 
     steps:
-      # Checkout the repository to the GitHub Actions runner
-      - name: Checkout
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v2
+
+      - name: Set output
+        id: vars
+        run: echo ::set-output name=short_ref::${GITHUB_REF#refs/*/}
 
       # Install the latest version of Terraform CLI and configure the Terraform CLI configuration file with a Terraform Cloud user API token
       - name: Setup Terraform
@@ -175,17 +171,18 @@ jobs:
 
       # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
       - name: Terraform Init
+        if: github.event_name == 'push'
         run: |
-          terraform -chdir=infra/${{ matrix.environment }}/services/app init -input=false
+          terraform -chdir=infra/${{ steps.vars.outputs.short_ref }}/services/app init -input=false
 
       # Generates an execution plan for Terraform
       - name: Terraform Plan
         if: github.event_name == 'push'
         run: |
-          terraform -chdir=infra/${{ matrix.environment }}/services/app plan -var "container_tag=${{ ENV.IMAGE_TAG }}"
+          terraform -chdir=infra/${{ steps.vars.outputs.short_ref }}/services/app plan -var "container_tag=${{ ENV.IMAGE_TAG }}"
 
       # On push to main, build or change infrastructure according to Terraform configuration files
       - name: Terraform Apply
         if: github.event_name == 'push'
         run: |
-          terraform -chdir=infra/${{ matrix.environment }}/services/app apply -var "container_tag=${{ ENV.IMAGE_TAG }}" -auto-approve
+          terraform -chdir=infra/${{ steps.vars.outputs.short_ref }}/services/app apply -var "container_tag=${{ ENV.IMAGE_TAG }}" -auto-approve
