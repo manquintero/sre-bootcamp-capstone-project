@@ -10,8 +10,7 @@ terraform {
 }
 
 locals {
-  environment = "dev"
-  name        = "sre-bootcamp"
+  name = "sre-bootcamp"
 }
 provider "aws" {
   region = "us-east-2"
@@ -38,16 +37,16 @@ module "vpc" {
   one_nat_gateway_per_az = false
 
   tags = {
-    Environment = local.environment
+    Environment = var.environment
     Name        = local.name
   }
 }
 
 module "app" {
-  source = "../../../modules/app"
+  source = "./modules/app"
 
   project     = local.name
-  environment = local.environment
+  environment = var.environment
 
   # Networking
   vpc_id                      = module.vpc.vpc_id
@@ -55,14 +54,14 @@ module "app" {
   bastion_internal_networks   = concat(module.vpc.private_subnets_cidr_blocks, module.vpc.database_subnets_cidr_blocks)
   bastion_vpc_zone_identifier = module.vpc.public_subnets
   # Elastic Container Service
-  ecs_desired_count    = 2
-  ecs_container_memory = 128
-  ecs_container_cpu    = 10
+  ecs_desired_count    = var.ecs_desired_count
+  ecs_container_memory = var.ecs_container_memory
+  ecs_container_cpu    = var.ecs_container_cpu
   ecs_container_tag    = var.container_tag
   # Auto Scaling Group
   asg_vpc_zone_identifier = module.vpc.private_subnets
-  asg_min_size            = 2
-  asg_max_size            = 2
+  asg_min_size            = var.asg_min_size
+  asg_max_size            = var.asg_max_size
   asg_instance_type       = "t2.micro"
   # Database
   db_subnets = module.vpc.database_subnets

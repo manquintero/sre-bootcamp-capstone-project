@@ -171,18 +171,17 @@ jobs:
 
       # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
       - name: Terraform Init
-        if: github.event_name == 'push'
         run: |
-          terraform -chdir=infra/${{ steps.vars.outputs.short_ref }}/services/app init -input=false
+          terraform init -input=false
 
       # Generates an execution plan for Terraform
       - name: Terraform Plan
         if: github.event_name == 'push'
         run: |
-          terraform -chdir=infra/${{ steps.vars.outputs.short_ref }}/services/app plan -var "container_tag=${{ ENV.IMAGE_TAG }}"
+          terraform plan -var-file="${{ steps.vars.outputs.short_ref }}.tfvars" -var "container_tag=${{ ENV.IMAGE_TAG }}"
 
       # On push to main, build or change infrastructure according to Terraform configuration files
       - name: Terraform Apply
         if: github.event_name == 'push'
         run: |
-          terraform -chdir=infra/${{ steps.vars.outputs.short_ref }}/services/app apply -var "container_tag=${{ ENV.IMAGE_TAG }}" -auto-approve
+          terraform apply -var-file="${{ steps.vars.outputs.short_ref }}.tfvars" -var "container_tag=${{ ENV.IMAGE_TAG }}" -auto-approve
