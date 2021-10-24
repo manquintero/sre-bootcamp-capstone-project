@@ -89,7 +89,7 @@ data "template_file" "task_definition_template" {
 }
 
 resource "aws_ecs_cluster" "ecs_cluster" {
-  name = "${var.app_name}-cluster-${var.environment}"
+  name = lower("${var.app_name}-cluster-${var.environment}")
 
   tags = {
     Environment = var.environment
@@ -109,11 +109,11 @@ resource "aws_ecs_task_definition" "task_definition" {
 }
 
 resource "aws_ecs_service" "app" {
-  # Force a new service deployment for every task definition
-  name            = "${var.app_name}-${aws_ecs_task_definition.task_definition.revision}"
-  cluster         = aws_ecs_cluster.ecs_cluster.id
-  task_definition = aws_ecs_task_definition.task_definition.arn
-  desired_count   = var.desired_count
+  name                 = var.app_name
+  cluster              = aws_ecs_cluster.ecs_cluster.id
+  task_definition      = aws_ecs_task_definition.task_definition.arn
+  desired_count        = var.desired_count
+  force_new_deployment = true
 
   deployment_circuit_breaker {
     enable   = true

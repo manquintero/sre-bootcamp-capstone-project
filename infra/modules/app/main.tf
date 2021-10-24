@@ -52,6 +52,16 @@ resource "aws_lb_target_group" "lbtg" {
   port     = local.host_port
   protocol = local.server_protocol
   vpc_id   = var.vpc_id
+
+  health_check {
+    path                = "/"
+    protocol            = "HTTP"
+    matcher             = "200"
+    interval            = 15
+    timeout             = 3
+    healthy_threshold   = 2
+    unhealthy_threshold = 2
+  }
 }
 
 resource "aws_lb_listener_rule" "asg" {
@@ -138,12 +148,13 @@ module "asg" {
   launch_config_prefix = local.app_name
   image_id             = data.aws_ami.amazon_linux_ecs.id
   # Auto-Scale
-  vpc_zone_identifier = var.asg_vpc_zone_identifier
-  target_group_arns   = [aws_lb_target_group.lbtg.arn]
-  min_size            = var.asg_min_size
-  max_size            = var.asg_max_size
-  health_check_type   = local.ec2_health_check_type
-  enable_autoscaling  = false
+  vpc_zone_identifier         = var.asg_vpc_zone_identifier
+  target_group_arns           = [aws_lb_target_group.lbtg.arn]
+  min_size                    = var.asg_min_size
+  health_check_type           = local.ec2_health_check_type
+  enable_autoscaling_schedule = var.asg_enable_autoscaling_schedule
+  public_networks             = var.asg_public_networks
+  enable_ssh_in               = var.asg_enable_ssh_in
 }
 
 module "lambda" {

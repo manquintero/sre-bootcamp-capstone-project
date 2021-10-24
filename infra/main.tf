@@ -63,10 +63,12 @@ module "app" {
   ecs_container_cpu    = var.ecs_container_cpu
   ecs_container_tag    = var.container_tag
   # Auto Scaling Group
-  asg_vpc_zone_identifier = module.vpc.private_subnets
-  asg_min_size            = var.asg_min_size
-  asg_max_size            = var.asg_max_size
-  asg_instance_type       = "t2.micro"
+  asg_public_networks             = module.vpc.public_subnets_cidr_blocks
+  asg_vpc_zone_identifier         = module.vpc.private_subnets
+  asg_min_size                    = var.asg_min_size
+  asg_instance_type               = "t2.micro"
+  asg_enable_autoscaling_schedule = var.asg_enable_autoscaling_schedule
+  asg_enable_ssh_in               = var.asg_enable_ssh_in
   # Database
   db_subnets           = module.vpc.database_subnets
   db_internal_networks = concat(module.vpc.public_subnets_cidr_blocks, module.vpc.private_subnets_cidr_blocks)

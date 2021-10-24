@@ -32,13 +32,18 @@ variable "asg_min_size" {
   type        = number
 }
 
-variable "asg_max_size" {
-  description = "The maximum number of EC2 Instances in the ASG"
-  type        = number
-}
-
 variable "asg_instance_type" {
   description = "Override the instance type in the Launch Template"
   type        = string
   default     = "t2.micro"
+}
+
+variable "asg_enable_ssh_in" {
+  description = "If set to true, enable ssh port from Bastion to EC2"
+  type        = bool
+}
+
+variable "asg_enable_autoscaling_schedule" {
+  description = "If set to true, enable auto scaling"
+  type        = bool
 }
