@@ -109,7 +109,7 @@ resource "aws_ecs_task_definition" "task_definition" {
 }
 
 resource "aws_ecs_service" "app" {
-  name                 = var.app_name
+  name                 = lower("${var.app_name}-${var.environment}")
   cluster              = aws_ecs_cluster.ecs_cluster.id
   task_definition      = aws_ecs_task_definition.task_definition.arn
   desired_count        = var.desired_count

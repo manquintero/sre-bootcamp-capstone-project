@@ -1,3 +1,8 @@
+variable "environment" {
+  description = "Infrastrucutre configuration"
+  type        = string
+}
+
 variable "vpc_id" {
   description = "VCP identifier"
   type        = string

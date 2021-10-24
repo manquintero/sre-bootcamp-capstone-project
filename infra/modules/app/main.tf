@@ -48,7 +48,7 @@ module "bastion" {
 }
 
 resource "aws_lb_target_group" "lbtg" {
-  name     = "${var.project}-lbtg"
+  name     = "${var.project}-${var.environment}-lbtg"
   port     = local.host_port
   protocol = local.server_protocol
   vpc_id   = var.vpc_id
@@ -137,6 +137,7 @@ module "asg" {
   source = "../cluster/asg"
 
   # Module config
+  environment               = var.environment
   vpc_id                    = var.vpc_id
   alb_security_group_id     = module.alb.security_group_id
   bastion_security_group_id = module.bastion.security_group_id
@@ -158,5 +159,6 @@ module "asg" {
 }
 
 module "lambda" {
-  source = "../lambda"
+  source      = "../lambda"
+  environment = var.environment
 }

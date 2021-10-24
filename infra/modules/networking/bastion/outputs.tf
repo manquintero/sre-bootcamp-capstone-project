@@ -9,5 +9,6 @@ output "key_name" {
 }
 
 output "public_ip" {
-  value = aws_eip.bastion_eips[*].public_ip
+  description = "Public IP addresses of instances found through the filter"
+  value       = data.aws_instances.bastion_instances.public_ips
 }

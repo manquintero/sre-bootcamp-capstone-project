@@ -33,7 +33,7 @@ resource "aws_db_subnet_group" "public" {
 }
 
 resource "aws_db_instance" "mysql" {
-  identifier_prefix         = var.identifier_prefix
+  identifier_prefix         = "${var.identifier_prefix}-"
   allocated_storage         = 5
   backup_retention_period   = 2
   backup_window             = "01:00-01:30"

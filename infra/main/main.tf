@@ -1,7 +1,7 @@
 terraform {
   backend "s3" {
     bucket = "sre-bootcamp-capstone-project-terraform"
-    key    = "devel/services/app/terraform.tfstate"
+    key    = "production/services/app/terraform.tfstate"
     region = "us-east-2"
 
     dynamodb_table = "sre-bootcamp-capstone-project-terraform-locks"
@@ -24,12 +24,12 @@ module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
   version = "~> 3.0"
 
-  name             = "${local.name}-vpc"
-  cidr             = "10.0.0.0/24"
+  name             = "${local.name}-${var.environment}-vpc"
+  cidr             = "10.2.0.0/24"
   azs              = [data.aws_availability_zones.available.names[0], data.aws_availability_zones.available.names[1]]
-  public_subnets   = ["10.0.0.0/26", "10.0.0.64/26"]
-  private_subnets  = ["10.0.0.128/27", "10.0.0.160/27"]
-  database_subnets = ["10.0.0.192/27", "10.0.0.224/27"]
+  public_subnets   = ["10.2.0.0/26", "10.2.0.64/26"]
+  private_subnets  = ["10.2.0.128/27", "10.2.0.160/27"]
+  database_subnets = ["10.2.0.192/27", "10.2.0.224/27"]
 
   # One NAT Gateway per subnet (default behavior)
   enable_nat_gateway     = true
@@ -47,7 +47,7 @@ module "vpc" {
 }
 
 module "app" {
-  source = "./modules/app"
+  source = "../modules/app"
 
   project     = local.name
   environment = var.environment

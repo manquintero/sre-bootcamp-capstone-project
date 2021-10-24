@@ -8,30 +8,17 @@ locals {
   bastion_name = "bastion-${var.environment}"
 }
 
-data "aws_instances" "bastion_instances" {
-  instance_tags = {
-    Name = local.bastion_name
-  }
-
-  instance_state_names = ["running"]
-}
-
-resource "aws_eip" "bastion_eips" {
-  count    = length(data.aws_instances.bastion_instances.ids)
-  instance = data.aws_instances.bastion_instances.ids[count.index]
-}
-
 data "template_file" "user_data" {
   template = file("${path.module}/user-data.sh")
 }
 
 resource "aws_key_pair" "bastion_key" {
-  key_name   = "bastion-key"
+  key_name   = "${local.bastion_name}-key"
   public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQD3JYHWXKVZnSn10XqlGcHWE1WvLqctuKvXmBlkmgQ+kbRGNLQU9R9B958WH5ay0t0LDwNlZA4iWsKWBl3efcF0BCktETaK3MwkUB6JIOz9Yz4/RqPG36o4iN445UDNnoJbPCULLNhXLrWx9lwJov7UZNemV3+8NCoIya1iqQTYWxz/8cj8e4r/WJs2EvKayyt/MfBarYzZledhI7/MOPYODMhPGJcaItDOCq3jr1xmhPTNrWPJ/bHR/iz+aVkOpuwWy3PbpZF1P2uw+Orfy5qSWqhVLcUpKvTnd+AujCS4E0DPuIGKgrXrCVzX6flrK7RExbGdRzNoVC66/aKXxdyr3DYS4ZWbGHaEIfXatKLu67mgniiQyFRviNKNXxW1QMsl9YlmpYKPJ7SvLkvGt1lHqyw9aHZpjjEZstnSF9WOJkKudyiKrbgfe9MgyUWK/b4f0JseexkF4iI9v7bhNkZ/UWt6rlecPGWbv2CtWWSwwjKyvBVl3tDbP3BzGhVyspK2gMvjmD0qn8cNdtAGyxhh1tV4zOiOx9pT/v/lDOi08yGHRixljJK653iQC+iBp69IsSyVf2n/aOE4r0cOdH+aD4j5dD9gyWKpgGGI8BGBdIEqoV+gP1xUKvy4YUWZdS9SUHsZNWHwKdxxE+EZT+Mhc83s+U4w0cjxFKEjSgdYSQ== man.quintero@gmail.com"
 }
 
 resource "aws_security_group" "bastion_sg" {
-  name        = "bastion-sg"
+  name        = "${local.bastion_name}-sg"
   description = "Security Group to allow minimal access to an instance"
   vpc_id      = var.vpc_id
 }
@@ -119,4 +106,17 @@ resource "aws_autoscaling_group" "bastions_asg" {
     value               = var.environment
     propagate_at_launch = true
   }
+}
+
+data "aws_instances" "bastion_instances" {
+  # Filters
+  instance_tags = {
+    Name = local.bastion_name
+  }
+  instance_state_names = ["running"]
+
+  # Avoid concurrency issues on first execution
+  depends_on = [
+    aws_autoscaling_group.bastions_asg
+  ]
 }
