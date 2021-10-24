@@ -145,11 +145,12 @@ module "asg" {
   bastion_security_group_id = module.bastion.security_group_id
   key_name                  = module.bastion.key_name
   # Launch configuration
-  instance_type        = var.asg_instance_type
-  cluster_name         = module.ecs.cluster_name
-  host_port            = local.host_port
-  launch_config_prefix = local.app_name
-  image_id             = data.aws_ami.amazon_linux_ecs.id
+  instance_type            = var.asg_instance_type
+  cluster_name             = module.ecs.cluster_name
+  task_definition_revision = module.ecs.task_definition_revision
+  host_port                = local.host_port
+  launch_config_prefix     = local.app_name
+  image_id                 = data.aws_ami.amazon_linux_ecs.id
   # Auto-Scale
   vpc_zone_identifier         = var.asg_vpc_zone_identifier
   target_group_arns           = [aws_lb_target_group.lbtg.arn]

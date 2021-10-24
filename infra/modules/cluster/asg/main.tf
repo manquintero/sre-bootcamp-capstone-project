@@ -160,7 +160,7 @@ resource "aws_autoscaling_group" "asg" {
 
   tag {
     key                 = "Name"
-    value               = var.cluster_name
+    value               = "${var.cluster_name}-${var.task_definition_revision}"
     propagate_at_launch = true
   }
 

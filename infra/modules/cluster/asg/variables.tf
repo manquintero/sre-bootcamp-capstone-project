@@ -23,6 +23,11 @@ variable "cluster_name" {
   type        = string
 }
 
+variable "task_definition_revision" {
+  description = "Revision of the task in a particular family"
+  type        = string
+}
+
 variable "instance_type" {
   description = "The type of EC2 Instances in the ASG"
   type        = string
