@@ -36,6 +36,10 @@ module "vpc" {
   single_nat_gateway     = false
   one_nat_gateway_per_az = false
 
+  # Database reachable via Domain Names
+  enable_dns_hostnames = true
+  enable_dns_support   = true
+
   tags = {
     Environment = var.environment
     Name        = local.name
@@ -64,5 +68,6 @@ module "app" {
   asg_max_size            = var.asg_max_size
   asg_instance_type       = "t2.micro"
   # Database
-  db_subnets = module.vpc.database_subnets
+  db_subnets           = module.vpc.database_subnets
+  db_internal_networks = concat(module.vpc.public_subnets_cidr_blocks, module.vpc.private_subnets_cidr_blocks)
 }

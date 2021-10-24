@@ -79,3 +79,8 @@ variable "db_subnets" {
   description = "A list of VPC subnet ID"
   type        = list(string)
 }
+
+variable "db_internal_networks" {
+  description = "Internal network CIDR blocks."
+  type        = list(string)
+}

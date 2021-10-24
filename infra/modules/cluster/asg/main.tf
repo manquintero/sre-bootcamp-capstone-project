@@ -128,7 +128,7 @@ resource "aws_autoscaling_group" "asg" {
   max_size = var.max_size
 
   # Wait for at least this many instances to pass health checks before considering the ASG deployment complete
-  min_elb_capacity = var.min_size
+  wait_for_elb_capacity = var.min_size
 
   # Configure integrations with a load balancer
   target_group_arns = var.target_group_arns

@@ -1,16 +1,17 @@
 locals {
   # Application
-  app_name              = "api"
-  container_name        = "sre-bootcamp"
-  host_port             = 8080
-  container_port        = 8000
-  server_protocol       = "HTTP"
-  ec2_health_check_type = "ELB"
+  app_name        = "api"
+  container_name  = "sre-bootcamp"
+  host_port       = 8080
+  container_port  = 8000
+  server_protocol = "HTTP"
+  # Stick to EC2, application healthcheck will take care of its own via ECS
+  ec2_health_check_type = "EC2"
   # Database
   db_username = "secret"
 }
 
-# For now we only use the AWS ECS optimized ami <https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-optimized_AMI.html>
+# For now we only use the AWS ECS optimized ami
 data "aws_ami" "amazon_linux_ecs" {
   most_recent = true
 
@@ -51,16 +52,6 @@ resource "aws_lb_target_group" "lbtg" {
   port     = local.host_port
   protocol = local.server_protocol
   vpc_id   = var.vpc_id
-
-  health_check {
-    path                = "/"
-    protocol            = "HTTP"
-    matcher             = "200"
-    interval            = 15
-    timeout             = 3
-    healthy_threshold   = 2
-    unhealthy_threshold = 2
-  }
 }
 
 resource "aws_lb_listener_rule" "asg" {
@@ -97,7 +88,7 @@ module "datastore" {
   environment = var.environment
 
   # Attributes
-  identifier_prefix         = "${var.project}-${var.environment}"
+  identifier_prefix         = lower("${var.project}-${var.environment}")
   final_snapshot_identifier = "${var.project}-${var.environment}-final"
   db_username               = local.db_username
   instance_class            = var.db_instance_class
@@ -108,6 +99,7 @@ module "datastore" {
   db_subnets             = var.db_subnets
   publicly_accessible    = true
   vpc_security_group_ids = module.asg.aws_security_group_ecs_sg_id
+  internal_networks      = var.db_internal_networks
 }
 
 module "ecs" {

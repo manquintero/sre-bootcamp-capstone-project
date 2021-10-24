@@ -4,6 +4,21 @@ locals {
   tcp_protocol = "tcp"
   any_protocol = "-1"
   all_ips      = ["0.0.0.0/0"]
+  # EC2
+  bastion_name = "bastion-${var.environment}"
+}
+
+data "aws_instances" "bastion_instances" {
+  instance_tags = {
+    Name = local.bastion_name
+  }
+
+  instance_state_names = ["running"]
+}
+
+resource "aws_eip" "bastion_eips" {
+  count    = length(data.aws_instances.bastion_instances.ids)
+  instance = data.aws_instances.bastion_instances.ids[count.index]
 }
 
 data "template_file" "user_data" {
@@ -95,7 +110,7 @@ resource "aws_autoscaling_group" "bastions_asg" {
 
   tag {
     key                 = "Name"
-    value               = "bastion-${var.environment}"
+    value               = local.bastion_name
     propagate_at_launch = true
   }
 

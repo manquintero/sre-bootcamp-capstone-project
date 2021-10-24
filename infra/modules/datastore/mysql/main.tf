@@ -1,7 +1,6 @@
 locals {
   sql_port     = 3306
   tcp_protocol = "tcp"
-  all_ips      = ["0.0.0.0/0"]
 }
 
 data "aws_secretsmanager_secret_version" "db_password" {
@@ -21,7 +20,7 @@ resource "aws_security_group_rule" "allow_sql_alb_inbound" {
   from_port   = local.sql_port
   to_port     = local.sql_port
   protocol    = local.tcp_protocol
-  cidr_blocks = local.all_ips
+  cidr_blocks = var.internal_networks
 }
 
 resource "aws_db_subnet_group" "public" {
