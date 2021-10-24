@@ -176,6 +176,7 @@ jobs:
 
       # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
       - name: Terraform Init
+        if: github.event_name == 'push'
         run: |
           terraform -chdir=infra/environments/${{ steps.vars.outputs.short_ref }} init
 
