@@ -4,10 +4,12 @@ name: CI
   push:
     branches:
       - main
+      - staging
       - development
   pull_request:
     branches:
       - main
+      - staging
 
 env:
   PROJECT_ID: ${{ secrets.GKE_PROJECT }}
