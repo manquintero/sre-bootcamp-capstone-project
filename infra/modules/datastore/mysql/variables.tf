@@ -47,3 +47,8 @@ variable "vpc_security_group_ids" {
   description = "Security group IDs to associate with"
   type        = string
 }
+
+variable "internal_networks" {
+  description = "Internal network CIDR blocks."
+  type        = list(string)
+}

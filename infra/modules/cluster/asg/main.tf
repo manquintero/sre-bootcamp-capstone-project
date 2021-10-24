@@ -58,6 +58,18 @@ resource "aws_security_group_rule" "service_in_lb" {
   security_group_id = aws_security_group.ecs_sg.id
 }
 
+resource "aws_security_group_rule" "service_in_bastion" {
+  description = "Allow inbound TCP connections from the Bastions to ECS service"
+
+  type        = "ingress"
+  from_port   = var.host_port
+  to_port     = var.host_port
+  protocol    = local.tcp_protocol
+  cidr_blocks = var.public_networks
+
+  security_group_id = aws_security_group.ecs_sg.id
+}
+
 # Allow all outbound traffic from the containers. This is necessary
 # to support pulling Docker images from Dockerhub and ECR.
 resource "aws_security_group_rule" "service_out" {
@@ -74,6 +86,7 @@ resource "aws_security_group_rule" "service_out" {
 
 # Allow inbound SSH connections from the internal networks
 resource "aws_security_group_rule" "ssh_in" {
+  count       = var.enable_ssh_in ? 1 : 0
   description = "Allow inbound connections for SSH protocol from the internal network"
   type        = "ingress"
 
@@ -118,17 +131,25 @@ resource "aws_launch_configuration" "ecs_launch_config" {
 }
 
 resource "aws_autoscaling_group" "asg" {
-  # Explicitly depend on the launch configuration's name so each time it's replaced this ASG is also replaced
-  name = "${var.cluster_name}-${aws_launch_configuration.ecs_launch_config.name}"
+  name_prefix = var.cluster_name
 
   vpc_zone_identifier  = var.vpc_zone_identifier
   launch_configuration = aws_launch_configuration.ecs_launch_config.name
 
   min_size = var.min_size
-  max_size = var.max_size
+  max_size = var.min_size * 2
 
   # Wait for at least this many instances to pass health checks before considering the ASG deployment complete
-  min_elb_capacity = var.min_size
+  min_elb_capacity          = var.min_size
+  wait_for_capacity_timeout = "20m"
+
+  instance_refresh {
+    strategy = "Rolling"
+    preferences {
+      min_healthy_percentage = 50
+    }
+    triggers = ["tag"]
+  }
 
   # Configure integrations with a load balancer
   target_group_arns = var.target_group_arns
@@ -139,10 +160,14 @@ resource "aws_autoscaling_group" "asg" {
     value               = var.cluster_name
     propagate_at_launch = true
   }
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_autoscaling_schedule" "scale_out_during_business_hours" {
-  count = var.enable_autoscaling ? 1 : 0
+  count = var.enable_autoscaling_schedule ? 1 : 0
 
   scheduled_action_name = "scale-out-during-business-hours"
   min_size              = 2
@@ -154,7 +179,7 @@ resource "aws_autoscaling_schedule" "scale_out_during_business_hours" {
 }
 
 resource "aws_autoscaling_schedule" "scale_in_at_night" {
-  count = var.enable_autoscaling ? 1 : 0
+  count = var.enable_autoscaling_schedule ? 1 : 0
 
   scheduled_action_name = "scale-in-at-night"
   min_size              = 2

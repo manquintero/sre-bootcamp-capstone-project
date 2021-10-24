@@ -1,16 +1,17 @@
 locals {
   # Application
-  app_name              = "api"
-  container_name        = "sre-bootcamp"
-  host_port             = 8080
-  container_port        = 8000
-  server_protocol       = "HTTP"
-  ec2_health_check_type = "ELB"
+  app_name        = "api"
+  container_name  = "sre-bootcamp"
+  host_port       = 8080
+  container_port  = 8000
+  server_protocol = "HTTP"
+  # Stick to EC2, application healthcheck will take care of its own via ECS
+  ec2_health_check_type = "EC2"
   # Database
   db_username = "secret"
 }
 
-# For now we only use the AWS ECS optimized ami <https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-optimized_AMI.html>
+# For now we only use the AWS ECS optimized ami
 data "aws_ami" "amazon_linux_ecs" {
   most_recent = true
 
@@ -97,7 +98,7 @@ module "datastore" {
   environment = var.environment
 
   # Attributes
-  identifier_prefix         = "${var.project}-${var.environment}"
+  identifier_prefix         = lower("${var.project}-${var.environment}")
   final_snapshot_identifier = "${var.project}-${var.environment}-final"
   db_username               = local.db_username
   instance_class            = var.db_instance_class
@@ -108,6 +109,7 @@ module "datastore" {
   db_subnets             = var.db_subnets
   publicly_accessible    = true
   vpc_security_group_ids = module.asg.aws_security_group_ecs_sg_id
+  internal_networks      = var.db_internal_networks
 }
 
 module "ecs" {
@@ -146,12 +148,13 @@ module "asg" {
   launch_config_prefix = local.app_name
   image_id             = data.aws_ami.amazon_linux_ecs.id
   # Auto-Scale
-  vpc_zone_identifier = var.asg_vpc_zone_identifier
-  target_group_arns   = [aws_lb_target_group.lbtg.arn]
-  min_size            = var.asg_min_size
-  max_size            = var.asg_max_size
-  health_check_type   = local.ec2_health_check_type
-  enable_autoscaling  = false
+  vpc_zone_identifier         = var.asg_vpc_zone_identifier
+  target_group_arns           = [aws_lb_target_group.lbtg.arn]
+  min_size                    = var.asg_min_size
+  health_check_type           = local.ec2_health_check_type
+  enable_autoscaling_schedule = var.asg_enable_autoscaling_schedule
+  public_networks             = var.asg_public_networks
+  enable_ssh_in               = var.asg_enable_ssh_in
 }
 
 module "lambda" {

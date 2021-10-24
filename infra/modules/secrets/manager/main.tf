@@ -4,13 +4,9 @@ resource "random_password" "database_password" {
 }
 
 resource "aws_secretsmanager_secret" "database_password_secret" {
-  name        = "/${var.environment}/datastore/master/${var.project}"
-  description = "Master password for the Database"
-
-  # Prevent accidental deletion of this S3 bucket
-  lifecycle {
-    prevent_destroy = true
-  }
+  name_prefix             = "${var.project}-${var.environment}-datastore-"
+  description             = "Master password for the Database"
+  recovery_window_in_days = 0
 
   tags = {
     "Environment" = var.environment

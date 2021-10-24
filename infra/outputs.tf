@@ -15,3 +15,8 @@ output "mysql_connection_parameters" {
   value       = module.app.mysql_connection_parameters
   description = "mysql connection string"
 }
+
+# Bastions
+output "bastion_public_ip" {
+  value = module.app.bastion_public_ip
+}

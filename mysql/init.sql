@@ -15,7 +15,7 @@
 
 -- Dumping database structure for bootcamp_tht
 DROP DATABASE IF EXISTS `bootcamp_tht`;
-CREATE DATABASE IF NOT EXISTS `bootcamp_tht` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
+CREATE DATABASE IF NOT EXISTS `bootcamp_tht`;
 USE `bootcamp_tht`;
 
 -- Dumping structure for table bootcamp_tht.users
@@ -34,7 +34,7 @@ DELETE FROM `users`;
 INSERT INTO `users` (`username`, `password`, `salt`, `role`) VALUES
 	('admin', '15e24a16abfc4eef5faeb806e903f78b188c30e4984a03be4c243312f198d1229ae8759e98993464cf713e3683e891fb3f04fbda9cc40f20a07a58ff4bb00788', 'F^S%QljSfV', 'admin'),
 	('bob', '2c9dab627bd73b6c4be5612ff77f18fa69fa7c2a71ecedb45dcec45311bea736e320462c6e8bfb2421ed112cfe54fac3eb9ff464f3904fe7cc915396b3df36f0', 'F^S%QljSfV', 'viewer'),
-	('noadmin', '89155af89e8a34dcbde088c72c3f001ac53486fcdb3946b1ed3fde8744ac397d99bf6f44e005af6f6944a1f7ed6bd0e2dd09b8ea3bcfd3e8862878d1709712e5', 'KjvFUC#K*i', 'editor');
+	('noadmin', '89155af89e8a34dcbde088c72c3f001ac53486fcdb3946b1ed3fde8744ac397d99bf6f44e005af6f6944a1f7ed6bd0e2dd09b8ea3bcfd3e8862878d1709712e5', 'KjvFUC#K*i', 'editor'),
 	('antonio', 'f3e9abade494fcb01bd207abc89dab2eb0ce2d83aae57a234a05190b06a677c6a22885e0069414285e52983e1f3d212308a8496ef37c6673328dbf6317ff2814', 'ew.qCjqXA/Hw', 'viewer');
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 

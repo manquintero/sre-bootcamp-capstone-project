@@ -15,3 +15,8 @@ output "mysql_connection_parameters" {
   value       = "mysql -u ${module.datastore.user} -h ${module.datastore.address} -p"
   description = "mysql connection string"
 }
+
+# Bastions
+output "bastion_public_ip" {
+  value = module.bastion.public_ip
+}

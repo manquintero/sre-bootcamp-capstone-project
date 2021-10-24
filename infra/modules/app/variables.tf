@@ -48,6 +48,11 @@ variable "ecs_container_tag" {
   type        = string
 }
 
+variable "asg_public_networks" {
+  description = "Internal network CIDR blocks."
+  type        = list(string)
+}
+
 variable "asg_vpc_zone_identifier" {
   description = "A list of subnet IDs to launch resources in."
   type        = list(string)
@@ -58,15 +63,20 @@ variable "asg_min_size" {
   type        = number
 }
 
-variable "asg_max_size" {
-  description = "The maximum number of EC2 Instances in the ASG"
-  type        = number
-}
-
 variable "asg_instance_type" {
   description = "Override the instance type in the Launch Template"
   type        = string
   default     = "t2.micro"
+}
+
+variable "asg_enable_ssh_in" {
+  description = "If set to true, enable ssh port from Bastion to EC2"
+  type        = bool
+}
+
+variable "asg_enable_autoscaling_schedule" {
+  description = "If set to true, enable auto scaling"
+  type        = bool
 }
 
 variable "db_instance_class" {
@@ -77,5 +87,10 @@ variable "db_instance_class" {
 
 variable "db_subnets" {
   description = "A list of VPC subnet ID"
+  type        = list(string)
+}
+
+variable "db_internal_networks" {
+  description = "Internal network CIDR blocks."
   type        = list(string)
 }

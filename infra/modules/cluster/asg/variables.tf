@@ -48,11 +48,6 @@ variable "min_size" {
   type        = number
 }
 
-variable "max_size" {
-  description = "The maximum number of EC2 Instances in the ASG"
-  type        = number
-}
-
 variable "health_check_type" {
   description = "The type of health check to perform. Must be one of: EC2, ELB."
   type        = string
@@ -64,7 +59,12 @@ variable "launch_config_prefix" {
   type        = string
 }
 
-variable "enable_autoscaling" {
+variable "enable_ssh_in" {
+  description = "If set to true, enable ssh port from Bastion to EC2"
+  type        = bool
+}
+
+variable "enable_autoscaling_schedule" {
   description = "If set to true, enable auto scaling"
   type        = bool
 }
@@ -72,4 +72,9 @@ variable "enable_autoscaling" {
 variable "image_id" {
   description = "The EC2 image ID to launch."
   type        = string
+}
+
+variable "public_networks" {
+  description = "Internal network CIDR blocks."
+  type        = list(string)
 }
