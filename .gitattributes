@@ -1,1 +1,2 @@
 *.drawio -diff
+user-data.sh text eol=lf
