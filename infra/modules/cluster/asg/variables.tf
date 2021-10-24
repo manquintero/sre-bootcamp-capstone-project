@@ -1,3 +1,8 @@
+variable "environment" {
+  description = "Infrastrucutre configuration"
+  type        = string
+}
+
 variable "vpc_id" {
   description = "VCP identifier"
   type        = string
@@ -15,6 +20,11 @@ variable "target_group_arns" {
 
 variable "cluster_name" {
   description = "Cluster Name"
+  type        = string
+}
+
+variable "task_definition_revision" {
+  description = "Revision of the task in a particular family"
   type        = string
 }
 

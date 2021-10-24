@@ -27,11 +27,6 @@ variable "ecs_container_cpu" {
   type    = number
 }
 
-variable "asg_min_size" {
-  description = "The minimum number of EC2 Instances in the ASG"
-  type        = number
-}
-
 variable "asg_instance_type" {
   description = "Override the instance type in the Launch Template"
   type        = string

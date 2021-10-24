@@ -99,12 +99,12 @@ resource "aws_security_group_rule" "ssh_in" {
 }
 
 resource "aws_iam_role" "ecs_agent" {
-  name               = "ecs-agent"
+  name               = "ecs-agent-${var.environment}"
   assume_role_policy = data.aws_iam_policy_document.ecs_agent.json
 }
 
 resource "aws_iam_instance_profile" "ecs_agent" {
-  name = "ecs-agent"
+  name = "ecs-agent-${var.environment}"
   role = aws_iam_role.ecs_agent.name
 }
 
@@ -131,7 +131,7 @@ resource "aws_launch_configuration" "ecs_launch_config" {
 }
 
 resource "aws_autoscaling_group" "asg" {
-  name_prefix = var.cluster_name
+  name_prefix = "${var.cluster_name}-"
 
   vpc_zone_identifier  = var.vpc_zone_identifier
   launch_configuration = aws_launch_configuration.ecs_launch_config.name
@@ -140,8 +140,11 @@ resource "aws_autoscaling_group" "asg" {
   max_size = var.min_size * 2
 
   # Wait for at least this many instances to pass health checks before considering the ASG deployment complete
-  min_elb_capacity          = var.min_size
-  wait_for_capacity_timeout = "20m"
+  min_elb_capacity = var.min_size
+
+  # This number is gretly influenced by the interactions between all systems, where the ALB healt checks depend on the
+  # EC2 running ECS which in turn depend on the DB connection strings.
+  wait_for_capacity_timeout = "10m"
 
   instance_refresh {
     strategy = "Rolling"
@@ -157,7 +160,7 @@ resource "aws_autoscaling_group" "asg" {
 
   tag {
     key                 = "Name"
-    value               = var.cluster_name
+    value               = "${var.cluster_name}-${var.task_definition_revision}"
     propagate_at_launch = true
   }
 
