@@ -36,7 +36,7 @@ This will bring the application container along with its database with sample da
 ## Cloud Deployment
 This app is being automatically deployed to AWS:
 
-- http://sre-bootcamp-dev-1981358638.us-east-2.elb.amazonaws.com/
+- http://sre-bootcamp-development-2115678365.us-east-2.elb.amazonaws.com/
 
 ## Executing tests
 
