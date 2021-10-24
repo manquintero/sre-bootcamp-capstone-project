@@ -1,7 +1,7 @@
 terraform {
   backend "s3" {
     bucket = "sre-bootcamp-capstone-project-terraform"
-    key    = "production/services/app/terraform.tfstate"
+    key    = "production/terraform.tfstate"
     region = "us-east-2"
 
     dynamodb_table = "sre-bootcamp-capstone-project-terraform-locks"
@@ -42,12 +42,12 @@ module "vpc" {
 
   tags = {
     Environment = var.environment
-    Name        = local.name
+    Name        = "${local.name}-${var.environment}"
   }
 }
 
 module "app" {
-  source = "../modules/app"
+  source = "../../modules/app"
 
   project     = local.name
   environment = var.environment
@@ -65,8 +65,8 @@ module "app" {
   # Auto Scaling Group
   asg_public_networks             = module.vpc.public_subnets_cidr_blocks
   asg_vpc_zone_identifier         = module.vpc.private_subnets
-  asg_min_size                    = var.asg_min_size
-  asg_instance_type               = "t2.micro"
+  asg_min_size                    = var.ecs_desired_count # The ASG needs to match the number of EC2
+  asg_instance_type               = var.asg_instance_type
   asg_enable_autoscaling_schedule = var.asg_enable_autoscaling_schedule
   asg_enable_ssh_in               = var.asg_enable_ssh_in
   # Database

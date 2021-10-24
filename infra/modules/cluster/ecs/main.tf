@@ -1,3 +1,7 @@
+locals {
+  name = lower("${var.app_name}-${var.environment}")
+}
+
 data "aws_iam_policy_document" "assume_role_policy" {
   statement {
     effect  = "Allow"
@@ -40,19 +44,19 @@ data "aws_iam_policy_document" "read_repository_credentials" {
 #####
 # Execution IAM Role
 #####
-resource "aws_iam_role" "execution" {
-  name               = "${var.app_name}-execution-role"
+resource "aws_iam_role" "execution_role" {
+  name               = "${local.name}-execution-role"
   assume_role_policy = data.aws_iam_policy_document.assume_role_policy.json
 }
 
 resource "aws_iam_role_policy_attachment" "ecs_task_execution_role_policy_attach" {
-  role       = aws_iam_role.execution.name
+  role       = aws_iam_role.execution_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
 
 resource "aws_iam_role_policy" "read_repository_credentials" {
-  name   = "${var.app_name}-read-repository-credentials"
-  role   = aws_iam_role.execution.id
+  name   = "${local.name}-read-repository-credentials"
+  role   = aws_iam_role.execution_role.id
   policy = data.aws_iam_policy_document.read_repository_credentials.json
 }
 
@@ -60,12 +64,12 @@ resource "aws_iam_role_policy" "read_repository_credentials" {
 # IAM - Task role, basic. Append policies to this role for S3, DynamoDB etc.
 #####
 resource "aws_iam_role" "task" {
-  name               = "${var.app_name}-task-role"
+  name               = "${local.name}-task-role"
   assume_role_policy = data.aws_iam_policy_document.assume_role_policy.json
 }
 
 resource "aws_iam_role_policy" "log_agent" {
-  name   = "${var.app_name}-log-permissions"
+  name   = "${local.name}-log-permissions"
   role   = aws_iam_role.task.id
   policy = data.aws_iam_policy_document.task_permissions.json
 }
@@ -89,7 +93,7 @@ data "template_file" "task_definition_template" {
 }
 
 resource "aws_ecs_cluster" "ecs_cluster" {
-  name = lower("${var.app_name}-cluster-${var.environment}")
+  name = "${local.name}"
 
   tags = {
     Environment = var.environment
@@ -100,7 +104,7 @@ resource "aws_ecs_task_definition" "task_definition" {
   family                = var.app_name
   container_definitions = data.template_file.task_definition_template.rendered
   # Roles
-  execution_role_arn = aws_iam_role.execution.arn
+  execution_role_arn = aws_iam_role.execution_role.arn
   task_role_arn      = aws_iam_role.task.arn
 
   tags = {
@@ -109,7 +113,7 @@ resource "aws_ecs_task_definition" "task_definition" {
 }
 
 resource "aws_ecs_service" "app" {
-  name                 = lower("${var.app_name}-${var.environment}")
+  name                 = "${local.name}"
   cluster              = aws_ecs_cluster.ecs_cluster.id
   task_definition      = aws_ecs_task_definition.task_definition.arn
   desired_count        = var.desired_count

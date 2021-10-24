@@ -23,13 +23,9 @@ resource "aws_security_group_rule" "allow_sql_alb_inbound" {
   cidr_blocks = var.internal_networks
 }
 
-resource "aws_db_subnet_group" "public" {
-  name       = "public"
+resource "aws_db_subnet_group" "subnet" {
+  name       = lower("rds-${var.environment}")
   subnet_ids = var.db_subnets
-
-  tags = {
-    Name = "Public"
-  }
 }
 
 resource "aws_db_instance" "mysql" {
@@ -45,7 +41,7 @@ resource "aws_db_instance" "mysql" {
   name                      = "bootcamp_tht"
   username                  = var.db_username
   port                      = "3306"
-  db_subnet_group_name      = aws_db_subnet_group.public.name
+  db_subnet_group_name      = aws_db_subnet_group.subnet.name
   vpc_security_group_ids    = [aws_security_group.rds_sg.id, var.vpc_security_group_ids]
   skip_final_snapshot       = true
   final_snapshot_identifier = var.final_snapshot_identifier

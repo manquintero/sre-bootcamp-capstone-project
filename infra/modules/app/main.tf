@@ -9,6 +9,8 @@ locals {
   ec2_health_check_type = "EC2"
   # Database
   db_username = "secret"
+  # Generic
+  name = lower("${var.project}-${var.environment}")
 }
 
 # For now we only use the AWS ECS optimized ami
@@ -31,7 +33,7 @@ data "aws_ami" "amazon_linux_ecs" {
 module "alb" {
   source = "../networking/alb"
 
-  alb_name    = "${var.project}-${var.environment}"
+  alb_name    = local.name
   vpc_id      = var.vpc_id
   subnet_ids  = var.alb_subnet_ids
   environment = var.environment
@@ -48,7 +50,7 @@ module "bastion" {
 }
 
 resource "aws_lb_target_group" "lbtg" {
-  name     = "${var.project}-${var.environment}-lbtg"
+  name     = "${local.name}-lbtg"
   port     = local.host_port
   protocol = local.server_protocol
   vpc_id   = var.vpc_id
@@ -80,8 +82,8 @@ resource "aws_lb_listener_rule" "asg" {
 }
 
 module "ecr" {
-  source     = "../container/ecr"
-  repository = "academy-${var.project}-manuel-quintero"
+  source          = "../container/ecr"
+  repository_name = "academy-${var.project}-manuel-quintero"
 }
 
 module "secrets" {
@@ -98,8 +100,8 @@ module "datastore" {
   environment = var.environment
 
   # Attributes
-  identifier_prefix         = lower("${var.project}-${var.environment}")
-  final_snapshot_identifier = "${var.project}-${var.environment}-final"
+  identifier_prefix         = lower("${var.project}-mysql-${var.environment}")
+  final_snapshot_identifier = "${local.name}-final"
   db_username               = local.db_username
   instance_class            = var.db_instance_class
   db_password_secret_id     = module.secrets.db_password_secret_arn
@@ -107,7 +109,7 @@ module "datastore" {
   # Networking and security
   vpc_id                 = var.vpc_id
   db_subnets             = var.db_subnets
-  publicly_accessible    = true
+  publicly_accessible    = false
   vpc_security_group_ids = module.asg.aws_security_group_ecs_sg_id
   internal_networks      = var.db_internal_networks
 }

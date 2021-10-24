@@ -1,7 +1,3 @@
-resource "aws_ecr_repository" "ecr" {
-  name = var.repository
-
-  lifecycle {
-    prevent_destroy = true
-  }
+data "aws_ecr_repository" "service" {
+  name = var.repository_name
 }

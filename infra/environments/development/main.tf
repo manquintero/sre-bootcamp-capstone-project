@@ -1,7 +1,7 @@
 terraform {
   backend "s3" {
     bucket = "sre-bootcamp-capstone-project-terraform"
-    key    = "staging/app/terraform.tfstate"
+    key    = "development/terraform.tfstate"
     region = "us-east-2"
 
     dynamodb_table = "sre-bootcamp-capstone-project-terraform-locks"
@@ -25,11 +25,11 @@ module "vpc" {
   version = "~> 3.0"
 
   name             = "${local.name}-${var.environment}-vpc"
-  cidr             = "10.1.0.0/24"
+  cidr             = "10.0.0.0/24"
   azs              = [data.aws_availability_zones.available.names[0], data.aws_availability_zones.available.names[1]]
-  public_subnets   = ["10.1.0.0/26", "10.1.0.64/26"]
-  private_subnets  = ["10.1.0.128/27", "10.1.0.160/27"]
-  database_subnets = ["10.1.0.192/27", "10.1.0.224/27"]
+  public_subnets   = ["10.0.0.0/26", "10.0.0.64/26"]
+  private_subnets  = ["10.0.0.128/27", "10.0.0.160/27"]
+  database_subnets = ["10.0.0.192/27", "10.0.0.224/27"]
 
   # One NAT Gateway per subnet (default behavior)
   enable_nat_gateway     = true
@@ -42,12 +42,12 @@ module "vpc" {
 
   tags = {
     Environment = var.environment
-    Name        = "${local.name}-${var.environment}"
+    Name        = local.name
   }
 }
 
 module "app" {
-  source = "../modules/app"
+  source = "../../modules/app"
 
   project     = local.name
   environment = var.environment
@@ -65,8 +65,8 @@ module "app" {
   # Auto Scaling Group
   asg_public_networks             = module.vpc.public_subnets_cidr_blocks
   asg_vpc_zone_identifier         = module.vpc.private_subnets
-  asg_min_size                    = var.asg_min_size
-  asg_instance_type               = "t2.micro"
+  asg_min_size                    = var.ecs_desired_count # The ASG needs to match the number of EC2
+  asg_instance_type               = var.asg_instance_type
   asg_enable_autoscaling_schedule = var.asg_enable_autoscaling_schedule
   asg_enable_ssh_in               = var.asg_enable_ssh_in
   # Database

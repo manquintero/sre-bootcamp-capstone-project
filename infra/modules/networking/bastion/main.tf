@@ -5,7 +5,7 @@ locals {
   any_protocol = "-1"
   all_ips      = ["0.0.0.0/0"]
   # EC2
-  bastion_name = "bastion-${var.environment}"
+  bastion_name = lower("bastion-${var.environment}")
 }
 
 data "template_file" "user_data" {
