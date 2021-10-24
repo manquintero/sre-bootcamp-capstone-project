@@ -180,7 +180,7 @@ jobs:
       - name: Terraform Plan
         if: github.event_name == 'push'
         run: |
-          terraform -chdir=infra/environments/${{ steps.vars.outputs.short_ref }} plan -var "container_tag=${{ ENV.IMAGE_TAG }}"
+          terraform -chdir=infra/environments/${{ steps.vars.outputs.short_ref }} plan -var "container_tag=${{ ENV.IMAGE_TAG }}" -input=false
 
       # On push to main, build or change infrastructure according to Terraform configuration files
       - name: Terraform Apply
