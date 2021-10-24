@@ -1,16 +1,12 @@
-# Welcome to your Bootcamp SRE Capstone Project!
-
-Remember that you can find the complete instructions for this project **[here](https://classroom.google.com/w/MzgwNTc4MDgwMjAw/t/all)**.
-
-If you have any questions, feel free to contact your mentor or one of us: Juan Barbosa, Laura Mata, or Francisco Bueno. We are here to support you.
+# SRE Capstone Project
 
 ## Status 
-| Metric | devel                                                                                                                       | main                                                                                                          |
-|--------|-----------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------|
-| CI/CD  | ![ devel](https://github.com/manquintero/sre-bootcamp-capstone-project/actions/workflows/ci-build.yml/badge.svg?branch=devel) | ![ main](https://github.com/manquintero/sre-bootcamp-capstone-project/actions/workflows/ci-build.yml/badge.svg) |
+| Metric | development                                                                                                                               | staging                                                                                                           | main (Production)                                                                                                          |
+|--------|-------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------|
+| CI/CD  | ![development](https://github.com/manquintero/sre-bootcamp-capstone-project/actions/workflows/ci-build.yml/badge.svg?branch=development)  | ![staging](https://github.com/manquintero/sre-bootcamp-capstone-project/actions/workflows/ci-build.yml/badge.svg) | ![main](https://github.com/manquintero/sre-bootcamp-capstone-project/actions/workflows/ci-build.yml/badge.svg) |
 
 ### Implemented features
-- CI workflow
+- CI/CD workflow
   - Pylint  (Code rated 10.0)
   - Pytest  (100% Pass rate)
   - Coverage  (100% Branch Coverage + 100% Line Coverage)
@@ -18,6 +14,7 @@ If you have any questions, feel free to contact your mentor or one of us: Juan B
 - Docker Compose
   - Application (Health Check)
   - Database (mysql)
+- Terraform
 
 ## Docker image
 ````sh
@@ -36,9 +33,16 @@ This will bring the application container along with its database with sample da
 ## Cloud Deployment
 This app is being automatically deployed to AWS:
 
-- http://sre-bootcamp-development-2115678365.us-east-2.elb.amazonaws.com/
+- http://sre-bootcamp-development-198286806.us-east-2.elb.amazonaws.com
+- http://sre-bootcamp-staging-283469283.us-east-2.elb.amazonaws.com
+- http://sre-bootcamp-production-990790453.us-east-2.elb.amazonaws.com
 
 ## Executing tests
+
+### Query for version
+```bash
+curl -s http://127.0.0.1:8000/version
+```
 
 ### Get Token
 ```bash
