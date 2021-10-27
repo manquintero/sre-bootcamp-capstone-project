@@ -113,7 +113,7 @@ resource "aws_ecs_task_definition" "task_definition" {
 }
 
 resource "aws_ecs_service" "app" {
-  name                 = local.name
+  name                 = "${local.name}-svc"
   cluster              = aws_ecs_cluster.ecs_cluster.id
   task_definition      = aws_ecs_task_definition.task_definition.arn
   desired_count        = var.desired_count
@@ -122,6 +122,14 @@ resource "aws_ecs_service" "app" {
   deployment_circuit_breaker {
     enable   = true
     rollback = true
+  }
+
+  deployment_controller {
+    type = "ECS"
+  }
+
+  ordered_placement_strategy {
+    type  = "random"
   }
 
   load_balancer {

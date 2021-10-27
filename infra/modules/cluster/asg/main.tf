@@ -22,6 +22,7 @@ data "template_file" "user_data" {
   template = file("${path.module}/templates/user-data.sh")
 
   vars = {
+    cluster_id = var.cluster_id
     cluster_name = var.cluster_name
   }
 }
@@ -131,7 +132,7 @@ resource "aws_launch_configuration" "ecs_launch_config" {
 }
 
 resource "aws_autoscaling_group" "asg" {
-  name_prefix = "${var.cluster_name}-"
+  name_prefix = "${var.cluster_name}-${aws_launch_configuration.ecs_launch_config.name}"
 
   vpc_zone_identifier  = var.vpc_zone_identifier
   launch_configuration = aws_launch_configuration.ecs_launch_config.name
@@ -140,7 +141,9 @@ resource "aws_autoscaling_group" "asg" {
   max_size = var.min_size * 2
 
   # Wait for at least this many instances to pass health checks before considering the ASG deployment complete
-  min_elb_capacity = var.min_size
+  # Rolling update => 1
+  # Blue/Green => var.min_size
+  wait_for_elb_capacity = 1
 
   # This number is gretly influenced by the interactions between all systems, where the ALB healt checks depend on the
   # EC2 running ECS which in turn depend on the DB connection strings.
