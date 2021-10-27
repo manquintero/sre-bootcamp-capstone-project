@@ -12,7 +12,7 @@ terraform {
 locals {
   name   = "sre-bootcamp"
   region = "us-east-2"
-  
+
   # Port binding
   ssh_port   = 22
   http_port  = 80

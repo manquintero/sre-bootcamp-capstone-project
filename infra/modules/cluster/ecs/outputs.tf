@@ -4,7 +4,7 @@ output "cluster_name" {
 
 output "cluster_id" {
   description = "ARN that identifies the cluster."
-  value = aws_ecs_cluster.ecs_cluster.id
+  value       = aws_ecs_cluster.ecs_cluster.id
 }
 
 output "task_definition_revision" {

@@ -22,7 +22,7 @@ data "template_file" "user_data" {
   template = file("${path.module}/templates/user-data.sh")
 
   vars = {
-    cluster_id = var.cluster_id
+    cluster_id   = var.cluster_id
     cluster_name = var.cluster_name
   }
 }

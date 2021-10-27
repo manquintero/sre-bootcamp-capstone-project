@@ -129,7 +129,7 @@ resource "aws_ecs_service" "app" {
   }
 
   ordered_placement_strategy {
-    type  = "random"
+    type = "random"
   }
 
   load_balancer {
