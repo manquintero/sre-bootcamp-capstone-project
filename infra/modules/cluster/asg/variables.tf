@@ -18,6 +18,11 @@ variable "target_group_arns" {
   type        = list(string)
 }
 
+variable "cluster_id" {
+  description = "Cluster ARN"
+  type        = string
+}
+
 variable "cluster_name" {
   description = "Cluster Name"
   type        = string

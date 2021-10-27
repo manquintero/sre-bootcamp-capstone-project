@@ -2,7 +2,6 @@ locals {
   # Application
   app_name        = "api"
   container_name  = "sre-bootcamp"
-  host_port       = 8080
   container_port  = 8000
   server_protocol = "HTTP"
   # Stick to EC2, application healthcheck will take care of its own via ECS
@@ -51,7 +50,7 @@ module "bastion" {
 
 resource "aws_lb_target_group" "lbtg" {
   name     = "${local.name}-lbtg"
-  port     = local.host_port
+  port     = var.ecs_host_port
   protocol = local.server_protocol
   vpc_id   = var.vpc_id
 
@@ -119,6 +118,7 @@ module "ecs" {
   # Cluster
   environment      = var.environment
   app_name         = local.app_name
+  host_port        = var.ecs_host_port
   container_port   = local.container_port
   container_name   = local.container_name
   container_image  = module.ecr.repository_url
@@ -127,7 +127,6 @@ module "ecs" {
   container_tag    = var.ecs_container_tag
   db_host          = module.datastore.address
   db_username      = local.db_username
-  host_port        = local.host_port
   desired_count    = var.ecs_desired_count
   # Load Balancer
   aws_lb_target_group_arn = aws_lb_target_group.lbtg.arn
@@ -146,10 +145,11 @@ module "asg" {
   key_name                  = module.bastion.key_name
   # Launch configuration
   instance_type            = var.asg_instance_type
+  cluster_id               = module.ecs.cluster_id
   cluster_name             = module.ecs.cluster_name
   task_definition_revision = module.ecs.task_definition_revision
-  host_port                = local.host_port
-  launch_config_prefix     = local.app_name
+  host_port                = var.ecs_host_port
+  launch_config_prefix     = "launch"
   image_id                 = data.aws_ami.amazon_linux_ecs.id
   # Auto-Scale
   vpc_zone_identifier         = var.asg_vpc_zone_identifier

@@ -28,6 +28,11 @@ variable "bastion_vpc_zone_identifier" {
   type        = list(string)
 }
 
+variable "ecs_host_port" {
+  description = "Port exposed in the host machine for the container"
+  type        = number
+}
+
 variable "ecs_desired_count" {
   description = "Number of instances of the task definition to place and keep running"
   type        = number
