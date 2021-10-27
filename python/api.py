@@ -17,7 +17,7 @@ protected = Restricted()
 @app.route("/")
 def url_root():
     """ Homepage """
-    return "OK"
+    return "ok"
 
 
 # Retrieves the container and app version
