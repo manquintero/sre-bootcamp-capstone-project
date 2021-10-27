@@ -8,7 +8,7 @@ The goal for this repository is to show the knowledge acquired during the execut
 ## Project Status
 | Metric | development                                                                                                                               | staging                                                                                                           | main (Production)                                                                                                          |
 |--------|-------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------|
-| CI/CD  | ![development](https://github.com/manquintero/sre-bootcamp-capstone-project/actions/workflows/ci-build.yml/badge.svg?branch=development)  | ![staging](https://github.com/manquintero/sre-bootcamp-capstone-project/actions/workflows/ci-build.yml/badge.svg) | ![main](https://github.com/manquintero/sre-bootcamp-capstone-project/actions/workflows/ci-build.yml/badge.svg) |
+| CI/CD  | ![development](https://github.com/manquintero/sre-bootcamp-capstone-project/actions/workflows/ci-build.yml/badge.svg?branch=development)  | ![staging](https://github.com/manquintero/sre-bootcamp-capstone-project/actions/workflows/ci-build.yml/badge.svg?branch=staging) | ![main](https://github.com/manquintero/sre-bootcamp-capstone-project/actions/workflows/ci-build.yml/badge.svg?branch=main) |
 
 
 ### Endpoints Implemented
@@ -36,6 +36,9 @@ The goal for this repository is to show the knowledge acquired during the execut
   + Single entry to the application via ELB
   + Bastion Hosts to reach the VPC
   + Application and DB allocated in private networks.
+  + NACs on Public Network
+  + Security Groups in All network
+  + Roles and Policies
 + DevOps & CI/CD Fundamentals
   + Docker + DockerCompose Workflow
     + 2 Services enabled
@@ -182,12 +185,12 @@ Three Environments have been designated based on the Branching Strategy:
 | Environment      | URL                                                                  |
 |------------------|----------------------------------------------------------------------|
 |Development       | http://sre-bootcamp-development-198286806.us-east-2.elb.amazonaws.com|
-|Staging           | http://sre-bootcamp-staging-283469283.us-east-2.elb.amazonaws.com    |
+|Staging           | http://sre-bootcamp-staging-1328736561.us-east-2.elb.amazonaws.com   |
 |Production        | http://sre-bootcamp-production-990790453.us-east-2.elb.amazonaws.com |
 
 The strategy is layered in two stages:
 
-1. EC2 with an AutoScaling Group following a rolling-update process where *min_elb_capacity* is defined.
+1. EC2 with an AutoScaling Group following a rolling-update process where *wait_for_elb_capacity* is defined.
 2. ECS with a *deployment_circuit_breaker* configured with *rollback*.
    1. Every Service/Task feeds from the same ECR but different task definition with the SHA embedded into it.
 
